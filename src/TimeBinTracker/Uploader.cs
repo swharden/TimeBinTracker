@@ -1,6 +1,6 @@
 ﻿namespace TimeBinTracker;
 
-internal class Uploader
+public class Uploader
 {
     private readonly string SettingURL;
     private readonly string SettingComputer;
@@ -32,7 +32,7 @@ internal class Uploader
         SettingSecret = lines[2];
     }
 
-    public void Upload(DayActivity day)
+    public string GetPayload(DayActivity day)
     {
         var payload = new
         {
@@ -42,12 +42,17 @@ internal class Uploader
             Hex = day.ToHex(),
         };
 
-        string json = System.Text.Json.JsonSerializer.Serialize(payload,
+        return System.Text.Json.JsonSerializer.Serialize(
+            payload,
             new System.Text.Json.JsonSerializerOptions
             {
                 WriteIndented = true
             });
+    }
 
+    public void Upload(DayActivity day)
+    {
+        string json = GetPayload(day);
         Console.WriteLine(json);
     }
 }

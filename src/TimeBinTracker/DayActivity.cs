@@ -2,7 +2,7 @@
 
 namespace TimeBinTracker;
 
-internal class DayActivity
+public class DayActivity
 {
     const int BINS_PER_HOUR = 6;
     const int HOURS_PER_DAY = 24;
