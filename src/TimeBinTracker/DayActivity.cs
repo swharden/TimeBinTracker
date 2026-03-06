@@ -8,25 +8,28 @@ internal class DayActivity
     const int HOURS_PER_DAY = 24;
     const int BINS_PER_DAY = BINS_PER_HOUR * HOURS_PER_DAY;
     readonly bool[] Activity = new bool[BINS_PER_DAY];
+    public readonly DateOnly Day = DateOnly.FromDateTime(DateTime.Now);
 
     public DayActivity()
     {
 
     }
 
-    public DayActivity(bool[] activity)
+    public DayActivity(DateOnly day, bool[] activity)
     {
         if (activity.Length != BINS_PER_DAY)
             throw new ArgumentException("invalid length");
         Array.Copy(activity, Activity, Activity.Length);
+        Day = day;
     }
 
-    public DayActivity(string hex)
+    public DayActivity(DateOnly day, string hex)
     {
         bool[] activity = HexToBoolArray(hex);
         if (activity.Length != BINS_PER_DAY)
             throw new ArgumentException("invalid length");
         Array.Copy(activity, Activity, Activity.Length);
+        Day = day;
     }
 
     public static DayActivity Random()
@@ -36,7 +39,7 @@ internal class DayActivity
         {
             activity[i] = System.Random.Shared.NextDouble() > .8;
         }
-        return new DayActivity(activity);
+        return new DayActivity(DateOnly.FromDateTime(DateTime.Now), activity);
     }
 
     public string ToChart()
