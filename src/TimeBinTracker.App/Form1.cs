@@ -5,6 +5,7 @@ public partial class Form1 : Form
     private readonly NotifyIcon TrayIcon;
     private readonly ContextMenuStrip TrayMenu;
     DayActivity DailyActivity = new();
+    readonly ActivityLogger ActivityLogger = new();
 
     public Form1()
     {
@@ -29,10 +30,15 @@ public partial class Form1 : Form
         {
             if (isActive)
             {
-                // TODO: account for daily rollover
+                ActivityLogger.LogActive();
                 DailyActivity.SetActive(TimeOnly.FromDateTime(DateTime.Now));
                 richTextBox3.Text = DailyActivity.ToChartHorizontal();
             }
+        };
+
+        btnOpenLogFolder.Click += (s, e) =>
+        {
+            System.Diagnostics.Process.Start("explorer.exe", ActivityLogger.LogFolder);
         };
     }
 

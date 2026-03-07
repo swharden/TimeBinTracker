@@ -33,6 +33,7 @@ partial class Form1
         richTextBox2 = new RichTextBox();
         activityMonitor1 = new ActivityMonitor();
         richTextBox3 = new RichTextBox();
+        btnOpenLogFolder = new Button();
         SuspendLayout();
         // 
         // button1
@@ -72,11 +73,21 @@ partial class Form1
         richTextBox3.TabIndex = 5;
         richTextBox3.Text = "";
         // 
+        // btnOpenLogFolder
+        // 
+        btnOpenLogFolder.Location = new Point(304, 21);
+        btnOpenLogFolder.Name = "btnOpenLogFolder";
+        btnOpenLogFolder.Size = new Size(150, 29);
+        btnOpenLogFolder.TabIndex = 6;
+        btnOpenLogFolder.Text = "Open Log Folder";
+        btnOpenLogFolder.UseVisualStyleBackColor = true;
+        // 
         // Form1
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(692, 621);
+        Controls.Add(btnOpenLogFolder);
         Controls.Add(richTextBox3);
         Controls.Add(activityMonitor1);
         Controls.Add(richTextBox2);
@@ -94,4 +105,5 @@ partial class Form1
     private RichTextBox richTextBox2;
     private ActivityMonitor activityMonitor1;
     private RichTextBox richTextBox3;
+    private Button btnOpenLogFolder;
 }
