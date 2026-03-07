@@ -42,6 +42,16 @@ public class DayActivity
         return new DayActivity(DateOnly.FromDateTime(DateTime.Now), activity);
     }
 
+    public void SetActive(TimeOnly time) => Set(time, true);
+    public void SetInactive(TimeOnly time) => Set(time, false);
+    public void Set(TimeOnly time, bool active)
+    {
+        int hourOffset = BINS_PER_HOUR * time.Hour;
+        int withinHourOffset = time.Minute / BINS_PER_HOUR;
+        int offset = hourOffset * withinHourOffset;
+        Activity[offset] = active;
+    }
+
     public string ToChart()
     {
         StringBuilder sb = new();
