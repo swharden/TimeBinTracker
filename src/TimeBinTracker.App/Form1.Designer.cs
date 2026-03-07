@@ -29,33 +29,23 @@ partial class Form1
     private void InitializeComponent()
     {
         System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-        button1 = new Button();
-        richTextBox2 = new RichTextBox();
+        rtbPayload = new RichTextBox();
         activityMonitor1 = new ActivityMonitor();
-        richTextBox3 = new RichTextBox();
+        rtbChart = new RichTextBox();
         btnOpenLogFolder = new Button();
         btnUpdateChart = new Button();
+        btnUpload = new Button();
         SuspendLayout();
         // 
-        // button1
+        // rtbPayload
         // 
-        button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-        button1.Location = new Point(551, 564);
-        button1.Name = "button1";
-        button1.Size = new Size(129, 42);
-        button1.TabIndex = 2;
-        button1.Text = "Upload Now";
-        button1.UseVisualStyleBackColor = true;
-        // 
-        // richTextBox2
-        // 
-        richTextBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        richTextBox2.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-        richTextBox2.Location = new Point(12, 354);
-        richTextBox2.Name = "richTextBox2";
-        richTextBox2.Size = new Size(668, 204);
-        richTextBox2.TabIndex = 3;
-        richTextBox2.Text = "";
+        rtbPayload.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        rtbPayload.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+        rtbPayload.Location = new Point(12, 354);
+        rtbPayload.Name = "rtbPayload";
+        rtbPayload.Size = new Size(683, 216);
+        rtbPayload.TabIndex = 3;
+        rtbPayload.Text = "";
         // 
         // activityMonitor1
         // 
@@ -64,15 +54,15 @@ partial class Form1
         activityMonitor1.Size = new Size(286, 126);
         activityMonitor1.TabIndex = 4;
         // 
-        // richTextBox3
+        // rtbChart
         // 
-        richTextBox3.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        richTextBox3.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-        richTextBox3.Location = new Point(12, 144);
-        richTextBox3.Name = "richTextBox3";
-        richTextBox3.Size = new Size(668, 204);
-        richTextBox3.TabIndex = 5;
-        richTextBox3.Text = "";
+        rtbChart.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+        rtbChart.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+        rtbChart.Location = new Point(12, 144);
+        rtbChart.Name = "rtbChart";
+        rtbChart.Size = new Size(683, 204);
+        rtbChart.TabIndex = 5;
+        rtbChart.Text = "";
         // 
         // btnOpenLogFolder
         // 
@@ -92,17 +82,26 @@ partial class Form1
         btnUpdateChart.Text = "Update Chart";
         btnUpdateChart.UseVisualStyleBackColor = true;
         // 
+        // btnUpload
+        // 
+        btnUpload.Location = new Point(304, 91);
+        btnUpload.Name = "btnUpload";
+        btnUpload.Size = new Size(150, 29);
+        btnUpload.TabIndex = 8;
+        btnUpload.Text = "Upload Now";
+        btnUpload.UseVisualStyleBackColor = true;
+        // 
         // Form1
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(692, 621);
+        ClientSize = new Size(707, 582);
+        Controls.Add(btnUpload);
         Controls.Add(btnUpdateChart);
         Controls.Add(btnOpenLogFolder);
-        Controls.Add(richTextBox3);
+        Controls.Add(rtbChart);
         Controls.Add(activityMonitor1);
-        Controls.Add(richTextBox2);
-        Controls.Add(button1);
+        Controls.Add(rtbPayload);
         Icon = (Icon)resources.GetObject("$this.Icon");
         Name = "Form1";
         StartPosition = FormStartPosition.CenterScreen;
@@ -111,10 +110,10 @@ partial class Form1
     }
 
     #endregion
-    private Button button1;
-    private RichTextBox richTextBox2;
+    private RichTextBox rtbPayload;
     private ActivityMonitor activityMonitor1;
-    private RichTextBox richTextBox3;
+    private RichTextBox rtbChart;
     private Button btnOpenLogFolder;
     private Button btnUpdateChart;
+    private Button btnUpload;
 }

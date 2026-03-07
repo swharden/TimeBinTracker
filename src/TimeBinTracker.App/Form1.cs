@@ -5,6 +5,7 @@ public partial class Form1 : Form
     private readonly NotifyIcon TrayIcon;
     private readonly ContextMenuStrip TrayMenu;
     readonly ActivityLogger ActivityLogger = new();
+    readonly Uploader Uploader = new();
 
     public Form1()
     {
@@ -30,6 +31,7 @@ public partial class Form1 : Form
             if (isActive)
             {
                 ActivityLogger.LogActive();
+                UpdateChart();
             }
         };
 
@@ -38,11 +40,21 @@ public partial class Form1 : Form
             System.Diagnostics.Process.Start("explorer.exe", ActivityLogger.LogFolder);
         };
 
-        btnUpdateChart.Click += (s, e) =>
+        btnUpdateChart.Click += (s, e) => UpdateChart();
+
+        // update at startup too
+        UpdateChart();
+
+        btnUpload.Click += (s, e) =>
         {
-            DayActivity da = DayActivity.FromLogFolder(DateTime.Today, ActivityLogger.LogFolder);
-            richTextBox3.Text = da.ToChartHorizontal();
         };
+    }
+
+    private void UpdateChart()
+    {
+        DayActivity da = DayActivity.FromLogFolder(DateTime.Today, ActivityLogger.LogFolder);
+        rtbChart.Text = da.ToChartHorizontal();
+        rtbPayload.Text = Uploader.GetPayload(da);
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)

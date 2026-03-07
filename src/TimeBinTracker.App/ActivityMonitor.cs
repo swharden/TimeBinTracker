@@ -14,8 +14,8 @@ public partial class ActivityMonitor : UserControl
 
     private readonly System.Windows.Forms.Timer Timer;
     private readonly TimeSpan CheckInterval = Debugger.IsAttached
-        ? TimeSpan.FromSeconds(1)
-        : TimeSpan.FromSeconds(30);
+        ? TimeSpan.FromSeconds(10)
+        : TimeSpan.FromSeconds(60);
 
     private Point LastPoint = Point.Empty;
     private string LastWindowTitle = string.Empty;
