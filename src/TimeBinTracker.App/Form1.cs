@@ -4,7 +4,6 @@ public partial class Form1 : Form
 {
     private readonly NotifyIcon TrayIcon;
     private readonly ContextMenuStrip TrayMenu;
-    DayActivity DailyActivity = new();
     readonly ActivityLogger ActivityLogger = new();
 
     public Form1()
@@ -31,8 +30,6 @@ public partial class Form1 : Form
             if (isActive)
             {
                 ActivityLogger.LogActive();
-                DailyActivity.SetActive(TimeOnly.FromDateTime(DateTime.Now));
-                richTextBox3.Text = DailyActivity.ToChartHorizontal();
             }
         };
 
@@ -40,14 +37,12 @@ public partial class Form1 : Form
         {
             System.Diagnostics.Process.Start("explorer.exe", ActivityLogger.LogFolder);
         };
-    }
 
-    private void Form1_Load(object sender, EventArgs e)
-    {
-        richTextBox3.Text = DailyActivity.ToChartHorizontal();
-
-        Uploader up = new();
-        richTextBox2.Text = up.GetPayload(DailyActivity);
+        btnUpdateChart.Click += (s, e) =>
+        {
+            DayActivity da = DayActivity.FromLogFolder(DateTime.Today, ActivityLogger.LogFolder);
+            richTextBox3.Text = da.ToChartHorizontal();
+        };
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)

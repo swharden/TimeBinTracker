@@ -34,6 +34,7 @@ partial class Form1
         activityMonitor1 = new ActivityMonitor();
         richTextBox3 = new RichTextBox();
         btnOpenLogFolder = new Button();
+        btnUpdateChart = new Button();
         SuspendLayout();
         // 
         // button1
@@ -82,11 +83,21 @@ partial class Form1
         btnOpenLogFolder.Text = "Open Log Folder";
         btnOpenLogFolder.UseVisualStyleBackColor = true;
         // 
+        // btnUpdateChart
+        // 
+        btnUpdateChart.Location = new Point(304, 56);
+        btnUpdateChart.Name = "btnUpdateChart";
+        btnUpdateChart.Size = new Size(150, 29);
+        btnUpdateChart.TabIndex = 7;
+        btnUpdateChart.Text = "Update Chart";
+        btnUpdateChart.UseVisualStyleBackColor = true;
+        // 
         // Form1
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(692, 621);
+        Controls.Add(btnUpdateChart);
         Controls.Add(btnOpenLogFolder);
         Controls.Add(richTextBox3);
         Controls.Add(activityMonitor1);
@@ -96,7 +107,6 @@ partial class Form1
         Name = "Form1";
         StartPosition = FormStartPosition.CenterScreen;
         Text = "Time Bin Tracker";
-        Load += Form1_Load;
         ResumeLayout(false);
     }
 
@@ -106,4 +116,5 @@ partial class Form1
     private ActivityMonitor activityMonitor1;
     private RichTextBox richTextBox3;
     private Button btnOpenLogFolder;
+    private Button btnUpdateChart;
 }
