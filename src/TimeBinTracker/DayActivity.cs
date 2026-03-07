@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 
 namespace TimeBinTracker;
 
@@ -13,6 +14,11 @@ public class DayActivity
     public DayActivity()
     {
 
+    }
+
+    public DayActivity(DateOnly day)
+    {
+        Day = day;
     }
 
     public DayActivity(DateOnly day, bool[] activity)
@@ -40,6 +46,27 @@ public class DayActivity
             activity[i] = System.Random.Shared.NextDouble() > .8;
         }
         return new DayActivity(DateOnly.FromDateTime(DateTime.Now), activity);
+    }
+
+    public static DayActivity FromLogFolder(DateTime dt, string logFolder = "logs")
+    {
+        DayActivity dayActivity = new(DateOnly.FromDateTime(dt));
+
+        string dayFolder = Path.Combine(logFolder, ActivityLogger.DateFolderName(dt));
+        if (!Directory.Exists(dayFolder))
+            return dayActivity; // no data for this day
+
+        foreach (string filename in Directory.GetFiles(dayFolder, "*.active"))
+        {
+            DateTime dt2 = DateTime.ParseExact(
+                 Path.GetFileNameWithoutExtension(filename),
+                "HH-mm",
+                CultureInfo.InvariantCulture
+            );
+            dayActivity.SetActive(TimeOnly.FromDateTime(dt2));
+        }
+
+        return dayActivity;
     }
 
     public void SetActive(TimeOnly time) => Set(time, true);

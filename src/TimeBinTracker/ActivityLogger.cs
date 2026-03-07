@@ -1,4 +1,6 @@
-﻿namespace TimeBinTracker;
+﻿using System.Globalization;
+
+namespace TimeBinTracker;
 
 public class ActivityLogger
 {
@@ -17,11 +19,25 @@ public class ActivityLogger
         return Path.Join(LogFolder, folderName);
     }
 
+    public static string DateFolderName(DateTime dt)
+    {
+        return $"{dt:yyyy}-{dt:MM}-{dt:dd}";
+    }
+
+    public static string TimeFileName(DateTime dt)
+    {
+        return $"{dt:HH}-{dt:mm}";
+    }
+
     public void LogActive()
     {
         DateTime dt = DateTime.Now;
-        string filename = $"{dt:yyyy}-{dt:MM}-{dt:dd}-{dt:HH}-{dt:mm}.log";
-        string filePath = Path.Combine(LogFolder, filename);
-        File.WriteAllText(filePath, string.Empty);
+
+        string dayFolder = Path.Combine(LogFolder, DateFolderName(dt));
+        if (!Directory.Exists(dayFolder))
+            Directory.CreateDirectory(dayFolder);
+
+        string timeFilePath = Path.Combine(dayFolder, $"{TimeFileName(dt)}.active");
+        File.WriteAllText(timeFilePath, string.Empty);
     }
 }
