@@ -1,4 +1,4 @@
-# TimeBinTracker <img src="dev/logo/original.svg" width="36" height="36">
+# TimeBinTracker <img src="dev/logo/original.svg" width="48" height="48">
 
 TimeBinTracker is a minimal computer use tracker I use to track my activity across multiple computers in real time. 
 
