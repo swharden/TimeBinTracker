@@ -4,6 +4,7 @@ public partial class Form1 : Form
 {
     private readonly NotifyIcon TrayIcon;
     private readonly ContextMenuStrip TrayMenu;
+    DayActivity DailyActivity = new();
 
     public Form1()
     {
@@ -23,15 +24,24 @@ public partial class Form1 : Form
 
         TrayIcon.DoubleClick += OnOpen;
         TrayIcon.MouseClick += OnTrayIconMouseClick;
+
+        activityMonitor1.ActivityChecked += (object? sender, bool isActive) =>
+        {
+            if (isActive)
+            {
+                // TODO: account for daily rollover
+                DailyActivity.SetActive(TimeOnly.FromDateTime(DateTime.Now));
+                richTextBox1.Text = DailyActivity.ToChart();
+            }
+        };
     }
 
     private void Form1_Load(object sender, EventArgs e)
     {
-        DayActivity da = DayActivity.Random();
-        richTextBox1.Text = da.ToChart();
+        richTextBox1.Text = DailyActivity.ToChart();
 
         Uploader up = new();
-        richTextBox2.Text = up.GetPayload(da);
+        richTextBox2.Text = up.GetPayload(DailyActivity);
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
