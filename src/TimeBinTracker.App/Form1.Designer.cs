@@ -35,6 +35,7 @@ partial class Form1
         btnOpenLogFolder = new Button();
         btnUpdateChart = new Button();
         btnUpload = new Button();
+        lblUploadResult = new Label();
         SuspendLayout();
         // 
         // rtbPayload
@@ -91,11 +92,21 @@ partial class Form1
         btnUpload.Text = "Upload Now";
         btnUpload.UseVisualStyleBackColor = true;
         // 
+        // lblUploadResult
+        // 
+        lblUploadResult.AutoSize = true;
+        lblUploadResult.Location = new Point(460, 95);
+        lblUploadResult.Name = "lblUploadResult";
+        lblUploadResult.Size = new Size(67, 20);
+        lblUploadResult.TabIndex = 9;
+        lblUploadResult.Text = "waiting...";
+        // 
         // Form1
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(707, 582);
+        Controls.Add(lblUploadResult);
         Controls.Add(btnUpload);
         Controls.Add(btnUpdateChart);
         Controls.Add(btnOpenLogFolder);
@@ -107,6 +118,7 @@ partial class Form1
         StartPosition = FormStartPosition.CenterScreen;
         Text = "Time Bin Tracker";
         ResumeLayout(false);
+        PerformLayout();
     }
 
     #endregion
@@ -116,4 +128,5 @@ partial class Form1
     private Button btnOpenLogFolder;
     private Button btnUpdateChart;
     private Button btnUpload;
+    private Label lblUploadResult;
 }

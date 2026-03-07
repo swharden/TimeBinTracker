@@ -1,10 +1,15 @@
-﻿namespace TimeBinTracker;
+﻿using System.Diagnostics;
+using System.Net;
+using System.Text;
+
+namespace TimeBinTracker;
 
 public class Uploader
 {
     private readonly string SettingURL;
     private readonly string SettingComputer;
     private readonly string SettingSecret;
+    private readonly HttpClient HttpClient = new();
 
     public Uploader()
     {
@@ -50,9 +55,11 @@ public class Uploader
             });
     }
 
-    public void Upload(DayActivity day)
+    public async Task<HttpStatusCode> Upload(DayActivity day)
     {
         string json = GetPayload(day);
-        Console.WriteLine(json);
+        StringContent content = new(json, Encoding.UTF8, "application/json");
+        var res = await HttpClient.PostAsync(SettingURL, content);
+        return res.StatusCode;
     }
 }

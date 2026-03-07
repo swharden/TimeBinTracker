@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace TimeBinTracker.App;
 
 public partial class Form1 : Form
@@ -45,9 +47,7 @@ public partial class Form1 : Form
         // update at startup too
         UpdateChart();
 
-        btnUpload.Click += (s, e) =>
-        {
-        };
+        btnUpload.Click += async (s, e) => await UploadToday();
     }
 
     private void UpdateChart()
@@ -55,6 +55,16 @@ public partial class Form1 : Form
         DayActivity da = DayActivity.FromLogFolder(DateTime.Today, ActivityLogger.LogFolder);
         rtbChart.Text = da.ToChartHorizontal();
         rtbPayload.Text = Uploader.GetPayload(da);
+    }
+
+    private async Task UploadToday()
+    {
+        DayActivity da = DayActivity.FromLogFolder(DateTime.Today, ActivityLogger.LogFolder);
+        lblUploadResult.Text = "Uploading...";
+        HttpStatusCode code = await Uploader.Upload(da);
+        lblUploadResult.Text = code == HttpStatusCode.OK
+            ? $"Success {TimeOnly.FromDateTime(DateTime.Now)}"
+            : $"Error {TimeOnly.FromDateTime(DateTime.Now)} {code}";
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
