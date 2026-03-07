@@ -1,5 +1,5 @@
 ﻿using TimeBinTracker;
 
 DayActivity day = DayActivity.Random();
-Uploader uploader = new();
-uploader.Upload(day);
+Console.WriteLine(day.ToChartVertical());
+Console.WriteLine(day.ToChartHorizontal());

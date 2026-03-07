@@ -47,12 +47,13 @@ public class DayActivity
     public void Set(TimeOnly time, bool active)
     {
         int hourOffset = BINS_PER_HOUR * time.Hour;
-        int withinHourOffset = time.Minute / BINS_PER_HOUR;
-        int offset = hourOffset * withinHourOffset;
+        double fractionInsideHour = time.Minute / 60.0;
+        int withinHourOffset = (int)(fractionInsideHour * BINS_PER_HOUR);
+        int offset = hourOffset + withinHourOffset;
         Activity[offset] = active;
     }
 
-    public string ToChart()
+    public string ToChartVertical()
     {
         StringBuilder sb = new();
         for (int i = 0; i < HOURS_PER_DAY; i++)
@@ -68,6 +69,38 @@ public class DayActivity
             sb.AppendLine();
         }
         return sb.ToString().Trim();
+    }
+
+    public string ToChartHorizontal()
+    {
+        static string GetHourName(int hour)
+        {
+            string suffix = "A";
+            if (hour >= 12)
+            {
+                hour -= 12;
+                suffix = "P";
+            }
+
+            return $"{hour:00}{suffix}";
+        }
+
+        StringBuilder sb = new();
+        for (int hour = 0; hour < HOURS_PER_DAY; hour++)
+        {
+            string hourName = GetHourName(hour);
+            sb.Append(hourName);
+
+            sb.Append('[');
+            for (int i = 0; i < BINS_PER_HOUR; i++)
+            {
+                sb.Append(Activity[hour * BINS_PER_HOUR + i] ? 'X' : '.');
+            }
+            sb.Append(']');
+
+            sb.Append((hour + 1) % 6 == 0 ? '\n' : ' ');
+        }
+        return sb.ToString();
     }
 
     public string ToHex() => BoolArrayToHex(Activity);
