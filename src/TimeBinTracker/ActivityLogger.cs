@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TimeBinTracker;
 
@@ -6,8 +7,9 @@ public class ActivityLogger
 {
     public readonly string LogFolder;
 
-    public ActivityLogger(string logFolder = "logs")
+    public ActivityLogger(string appFolder)
     {
+        string logFolder = Path.Combine(appFolder, "logs");
         if (!Directory.Exists(logFolder))
             Directory.CreateDirectory(logFolder);
         LogFolder = Path.GetFullPath(logFolder);

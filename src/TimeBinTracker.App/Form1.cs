@@ -4,14 +4,20 @@ namespace TimeBinTracker.App;
 
 public partial class Form1 : Form
 {
-    private readonly NotifyIcon TrayIcon;
-    private readonly ContextMenuStrip TrayMenu;
-    readonly ActivityLogger ActivityLogger = new();
-    readonly Uploader Uploader = new();
+    readonly NotifyIcon TrayIcon;
+    readonly ContextMenuStrip TrayMenu;
+    readonly ActivityLogger ActivityLogger;
+    readonly Uploader Uploader;
 
     public Form1()
     {
         InitializeComponent();
+
+        string appFolder = Path.GetDirectoryName(Application.ExecutablePath)
+           ?? throw new NullReferenceException("unable to determine app folder");
+
+        ActivityLogger = new(appFolder);
+        Uploader = new(appFolder);
 
         TrayMenu = new ContextMenuStrip();
         TrayMenu.Items.Add("Open", null, OnOpen);
@@ -20,7 +26,7 @@ public partial class Form1 : Form
         TrayIcon = new NotifyIcon
         {
             Text = "My App",
-            Icon = new Icon("icon.ico"),
+            Icon = new Icon(Path.Combine(appFolder, "icon.ico")),
             ContextMenuStrip = TrayMenu,
             Visible = true
         };
@@ -42,13 +48,18 @@ public partial class Form1 : Form
             System.Diagnostics.Process.Start("explorer.exe", ActivityLogger.LogFolder);
         };
 
+        UpdateChart(); // update chart at startup
         btnUpdateChart.Click += (s, e) => UpdateChart();
 
-        // update at startup too
-        UpdateChart();
-
         btnUpload.Click += async (s, e) => await UploadToday();
+
+        cbStartWithWindows.Checked = StartWithWindows.IsEnabled(); // update check at startup
+        cbStartWithWindows.CheckedChanged += (s, e) =>
+        {
+            StartWithWindows.Set(cbStartWithWindows.Checked);
+        };
     }
+
 
     private void UpdateChart()
     {

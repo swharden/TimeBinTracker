@@ -36,6 +36,7 @@ partial class Form1
         btnUpdateChart = new Button();
         btnUpload = new Button();
         lblUploadResult = new Label();
+        cbStartWithWindows = new CheckBox();
         SuspendLayout();
         // 
         // rtbPayload
@@ -101,11 +102,22 @@ partial class Form1
         lblUploadResult.TabIndex = 9;
         lblUploadResult.Text = "waiting...";
         // 
+        // cbStartWithWindows
+        // 
+        cbStartWithWindows.AutoSize = true;
+        cbStartWithWindows.Location = new Point(460, 24);
+        cbStartWithWindows.Name = "cbStartWithWindows";
+        cbStartWithWindows.Size = new Size(159, 24);
+        cbStartWithWindows.TabIndex = 10;
+        cbStartWithWindows.Text = "Start with Windows";
+        cbStartWithWindows.UseVisualStyleBackColor = true;
+        // 
         // Form1
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
         ClientSize = new Size(707, 582);
+        Controls.Add(cbStartWithWindows);
         Controls.Add(lblUploadResult);
         Controls.Add(btnUpload);
         Controls.Add(btnUpdateChart);
@@ -129,4 +141,5 @@ partial class Form1
     private Button btnUpdateChart;
     private Button btnUpload;
     private Label lblUploadResult;
+    private CheckBox cbStartWithWindows;
 }

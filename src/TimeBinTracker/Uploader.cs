@@ -11,9 +11,9 @@ public class Uploader
     private readonly string SettingSecret;
     private readonly HttpClient HttpClient = new();
 
-    public Uploader()
+    public Uploader(string appFolder)
     {
-        string settingsFile = Path.GetFullPath("settings.txt");
+        string settingsFile = Path.Combine(appFolder, "settings.txt");
 
         if (!File.Exists(settingsFile))
         {
