@@ -10,6 +10,8 @@ TimeBinTracker is a minimal computer use tracker I use to track my activity acro
 
 ![](dev/screenshots/app-0.3.png)
 
+![](dev/screenshots/site.png)
+
 ## Design Goals
 
 * **Anonymous activity** - Although mouse and window titles are used to detect activity, only timestamps of activity are recorded.
