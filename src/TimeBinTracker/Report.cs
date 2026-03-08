@@ -135,7 +135,7 @@ internal class Report()
 
                     /* hour workday starts */
                     .sq-hour:nth-of-type(9) {
-                        border-left: 2px solid rgba(0, 0, 0, 1);
+                        border-right: 2px solid rgba(0, 0, 0, 1);
                     }
 
                     /* hour workday ends */
@@ -147,7 +147,7 @@ internal class Report()
 
             <body>
                 <div class="container-fluid my-5">
-                    <h1 class="text-center">Time Bin Tracker</h1>
+                    <h1 class="text-center my-4">Time Bin Tracker</h1>
 
                     {{dayHtml}}
 
