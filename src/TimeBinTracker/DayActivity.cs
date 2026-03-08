@@ -17,6 +17,18 @@ public class DayActivity
 
     }
 
+    public DayActivity(string dayFolder)
+    {
+        foreach (string file in Directory.GetFiles(dayFolder, "*.active"))
+        {
+            string filename = Path.GetFileNameWithoutExtension(file);
+            string[] split = filename.Split('-');
+            int hour = int.Parse(split[0]);
+            int minute = int.Parse(split[1]);
+            Set(hour, minute, true);
+        }
+    }
+
     public DayActivity(DateOnly day)
     {
         Day = day;
@@ -72,10 +84,11 @@ public class DayActivity
 
     public void SetActive(TimeOnly time) => Set(time, true);
     public void SetInactive(TimeOnly time) => Set(time, false);
-    public void Set(TimeOnly time, bool active)
+    public void Set(TimeOnly time, bool active) => Set(time.Hour, time.Minute, active);
+    public void Set(int hour, int minute, bool active)
     {
-        int hourOffset = BINS_PER_HOUR * time.Hour;
-        double fractionInsideHour = time.Minute / 60.0;
+        int hourOffset = BINS_PER_HOUR * hour;
+        double fractionInsideHour = minute / 60.0;
         int withinHourOffset = (int)(fractionInsideHour * BINS_PER_HOUR);
         int offset = hourOffset + withinHourOffset;
         Activity[offset] = active;
