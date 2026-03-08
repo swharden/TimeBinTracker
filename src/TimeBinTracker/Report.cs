@@ -67,7 +67,7 @@ internal class Report()
         }
 
         string weekOf = date.DayOfWeek == DayOfWeek.Monday
-            ? "<div class=\"fw-semibold mt-4\">Week of 2025-09-08</div>"
+            ? $"<div class=\"fw-semibold mt-4\">Week of {date}</div>"
             : string.Empty;
 
         string sectionTemplate = $"""
@@ -106,7 +106,7 @@ internal class Report()
 
                     .sq {
                         display: inline-block;
-                        width: 6px;
+                        width: 8px;
                         height: 20px;
                         vertical-align: top;
                         border: 1px solid rgba(0, 0, 0, .05)
@@ -130,7 +130,7 @@ internal class Report()
 
                     .sq-hour {
                         display: flex;
-                        /*outline: 1px solid rgba(0, 0, 0, .1)*/
+                        outline: 1px solid rgba(0, 0, 0, .15);
                     }
 
                     /* hour workday starts */

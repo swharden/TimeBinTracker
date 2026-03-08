@@ -173,7 +173,7 @@ public class DayActivity
     {
         int activeBins = Activity.Where(x => x == true).Count();
         double hours = (double)activeBins / BINS_PER_HOUR;
-        return Math.Round(hours, 1);
+        return Math.Round(hours, 2);
     }
 
     public string WriteAllBinsToDisk(string outputFolder)
