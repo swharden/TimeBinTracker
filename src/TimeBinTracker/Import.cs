@@ -7,12 +7,15 @@ internal class Import
         string[] dailyFiles = Directory.GetFiles(inputFolder, "*.txt");
         foreach (string dailyFile in dailyFiles)
         {
-            ImportDailyFile(dailyFile, outputFolder);
-            break;
+            DayActivity day = ImportDailyFile(dailyFile, outputFolder);
+            string dayFolder = day.WriteAllBinsToDisk(outputFolder);
+            Console.WriteLine();
+            Console.WriteLine(dayFolder);
+            Console.WriteLine(day.ToChart());
         }
     }
 
-    private static void ImportDailyFile(string inputFile, string outputFolder)
+    private static DayActivity ImportDailyFile(string inputFile, string outputFolder)
     {
         string dayCode = Path.GetFileNameWithoutExtension(inputFile);
         DateOnly date = DateOnly.Parse(dayCode);
@@ -35,6 +38,6 @@ internal class Import
             day.SetActive(time);
         }
 
-        Console.WriteLine(day.ToChart());
+        return day;
     }
 }

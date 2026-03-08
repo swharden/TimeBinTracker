@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
+using System.Timers;
 
 namespace TimeBinTracker;
 
@@ -109,7 +110,8 @@ public class DayActivity
 
             sb.Append((hour + 1) % 6 == 0 ? '\n' : ' ');
         }
-        return sb.ToString();
+
+        return sb.ToString().Trim();
     }
 
     public string ToHex() => BoolArrayToHex(Activity);
@@ -150,5 +152,37 @@ public class DayActivity
     public string GetDayCode()
     {
         return $"{Day.Year:0000}-{Day.Month:00}-{Day.Day:00}";
+    }
+
+    public string WriteAllBinsToDisk(string outputFolder)
+    {
+        string dayFolder = Path.Combine(outputFolder, GetDayCode());
+        if (!Directory.Exists(dayFolder))
+            Directory.CreateDirectory(dayFolder);
+
+        for (int hour = 0; hour < HOURS_PER_DAY; hour++)
+        {
+            for (int i = 0; i < BINS_PER_HOUR; i++)
+            {
+                int binIndex = hour * BINS_PER_HOUR + i;
+                if (Activity[binIndex])
+                {
+                    WriteActiveBinToDisk(dayFolder, binIndex);
+                }
+            }
+        }
+
+        return dayFolder;
+    }
+
+    private static void WriteActiveBinToDisk(string dayFolder, int binIndex)
+    {
+        int hour = binIndex / BINS_PER_HOUR;
+        int binsIntoNextHour = binIndex - (hour * BINS_PER_HOUR);
+        double minutes = 60.0 * binsIntoNextHour / BINS_PER_HOUR;
+
+        string filename = $"{hour:00}-{minutes:00}.active";
+        string timeFilePath = Path.Combine(dayFolder, filename);
+        File.WriteAllText(timeFilePath, string.Empty);
     }
 }
