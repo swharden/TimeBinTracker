@@ -6,9 +6,9 @@ namespace TimeBinTracker;
 
 public class DayActivity
 {
-    const int BINS_PER_HOUR = 6;
-    const int HOURS_PER_DAY = 24;
-    const int BINS_PER_DAY = BINS_PER_HOUR * HOURS_PER_DAY;
+    public const int BINS_PER_HOUR = 6;
+    public const int HOURS_PER_DAY = 24;
+    public const int BINS_PER_DAY = BINS_PER_HOUR * HOURS_PER_DAY;
     readonly bool[] Activity = new bool[BINS_PER_DAY];
     public readonly DateOnly Day = DateOnly.FromDateTime(DateTime.Now);
 
@@ -19,6 +19,8 @@ public class DayActivity
 
     public DayActivity(string dayFolder)
     {
+        Day = DateOnly.Parse(Path.GetFileNameWithoutExtension(dayFolder));
+
         foreach (string file in Directory.GetFiles(dayFolder, "*.active"))
         {
             string filename = Path.GetFileNameWithoutExtension(file);
@@ -167,6 +169,13 @@ public class DayActivity
         return $"{Day.Year:0000}-{Day.Month:00}-{Day.Day:00}";
     }
 
+    public double GetTotalActiveHours()
+    {
+        int activeBins = Activity.Where(x => x == true).Count();
+        double hours = (double)activeBins / BINS_PER_HOUR;
+        return Math.Round(hours, 1);
+    }
+
     public string WriteAllBinsToDisk(string outputFolder)
     {
         string dayFolder = Path.Combine(outputFolder, GetDayCode());
@@ -198,4 +207,6 @@ public class DayActivity
         string timeFilePath = Path.Combine(dayFolder, filename);
         File.WriteAllText(timeFilePath, string.Empty);
     }
+
+    public bool IsActive(int binIndex) => Activity[binIndex];
 }
