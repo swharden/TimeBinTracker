@@ -4,7 +4,7 @@ TimeBinTracker is a minimal computer use tracker I use to track my activity acro
 
 * **A desktop app detects activity** every few minutes and logs it to the filesystem. Occasionally it syncs activity data with the cloud.
 
-* A website displays activity data in real time aggregated across all devices.
+* **A website displays real-time activity data** aggregated across all devices.
 
 ## Screenshots
 
