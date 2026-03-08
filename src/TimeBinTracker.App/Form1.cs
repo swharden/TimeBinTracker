@@ -65,7 +65,6 @@ public partial class Form1 : Form
     {
         DayActivity da = DayActivity.FromLogFolder(DateTime.Today, ActivityLogger.LogFolder);
         rtbChart.Text = da.ToChartHorizontal();
-        rtbPayload.Text = Uploader.GetPayload(da);
     }
 
     private async Task UploadToday()

@@ -164,4 +164,9 @@ public class DayActivity
 
         return active;
     }
+
+    public string GetDayCode()
+    {
+        return $"{Day.Year:0000}-{Day.Month:00}-{Day.Day:00}";
+    }
 }

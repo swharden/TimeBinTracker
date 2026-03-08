@@ -32,7 +32,7 @@ foreach (['ComputerId', 'Secret', 'Day', 'Hex'] as $field) {
 
 // Verify password
 if (!hash_equals($EXPECTED_SECRET, $body['Secret'])) {
-    respond(403, 'Forbidden');
+    respond(403, 'Incorrect Password');
 }
 
 // Validate date format (YYYY-MM-DD)
