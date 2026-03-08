@@ -1,7 +1,5 @@
 ﻿using TimeBinTracker;
 
-//DayActivity day = DayActivity.Random();
-string logFolder = @"C:\Users\swhar\Documents\personal-repos\TimeBinTracker\src\TimeBinTracker.App\bin\Debug\net10.0-windows\logs";
-DayActivity day = DayActivity.FromLogFolder(DateTime.Today, logFolder);
-Console.WriteLine(day.ToChartVertical());
-Console.WriteLine(day.ToChartHorizontal());
+string logFolderIn = @"C:\Users\sharden\source\repos\ActiveWindowLogger\BUILD2\logs";
+string logFolderOut = Path.GetFullPath("converted");
+Import.ActiveWindowLogger(logFolderIn, logFolderOut);

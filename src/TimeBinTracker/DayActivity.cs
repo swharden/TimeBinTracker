@@ -80,25 +80,7 @@ public class DayActivity
         Activity[offset] = active;
     }
 
-    public string ToChartVertical()
-    {
-        StringBuilder sb = new();
-        for (int i = 0; i < HOURS_PER_DAY; i++)
-        {
-            int hourOffset = BINS_PER_HOUR * i;
-            sb.Append($"{i:00} ");
-            for (int j = 0; j < BINS_PER_HOUR; j++)
-            {
-                int offset = hourOffset + j;
-                char c = Activity[offset] ? 'X' : '.';
-                sb.Append(c);
-            }
-            sb.AppendLine();
-        }
-        return sb.ToString().Trim();
-    }
-
-    public string ToChartHorizontal()
+    public string ToChart()
     {
         static string GetHourName(int hour)
         {

@@ -65,7 +65,7 @@ public partial class Form1 : Form
     private void UpdateChart()
     {
         DayActivity da = DayActivity.FromLogFolder(DateTime.Today, ActivityLogger.LogFolder);
-        rtbChart.Text = da.ToChartHorizontal();
+        rtbChart.Text = da.ToChart();
     }
 
     private async Task UploadToday()
