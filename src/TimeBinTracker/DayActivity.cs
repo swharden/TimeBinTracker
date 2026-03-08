@@ -133,11 +133,13 @@ public class DayActivity
 
     private static string BoolArrayToHex(bool[] active)
     {
-        if (active.Length != 144)
-            throw new ArgumentException("Array must be exactly 144 elements.");
+        int expectedElements = BINS_PER_DAY; // 96
+        int expectedBytes = BINS_PER_DAY / 8; // 12
 
-        // 144 bits = 18 bytes
-        byte[] bytes = new byte[18];
+        if (active.Length != expectedElements)
+            throw new ArgumentException($"Array must be exactly {expectedElements} elements.");
+
+        byte[] bytes = new byte[expectedBytes];
 
         for (int i = 0; i < active.Length; i++)
         {
@@ -150,8 +152,12 @@ public class DayActivity
 
     private static bool[] HexToBoolArray(string hex)
     {
-        if (hex.Length != 36)
-            throw new ArgumentException("Hex string must be exactly 36 characters (18 bytes).");
+        int expectedElements = BINS_PER_DAY;
+        int expectedBytes = expectedElements / 8;
+        int expectedHexLength = expectedElements * 2;
+
+        if (hex.Length != expectedHexLength)
+            throw new ArgumentException($"Hex string must be exactly {expectedHexLength} characters ({expectedBytes} bytes).");
 
         byte[] bytes = Convert.FromHexString(hex);
         bool[] active = new bool[144];
