@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 
 namespace TimeBinTracker.App;
@@ -12,6 +13,7 @@ public partial class Form1 : Form
     public Form1()
     {
         InitializeComponent();
+        Text = Version.NameAndNumber;
 
         string appFolder = Path.GetDirectoryName(Application.ExecutablePath)
            ?? throw new NullReferenceException("unable to determine app folder");
@@ -49,7 +51,6 @@ public partial class Form1 : Form
         };
 
         UpdateChart(); // update chart at startup
-        btnUpdateChart.Click += (s, e) => UpdateChart();
 
         btnUpload.Click += async (s, e) => await UploadToday();
 

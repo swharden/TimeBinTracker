@@ -29,25 +29,15 @@ partial class Form1
     private void InitializeComponent()
     {
         System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-        rtbPayload = new RichTextBox();
         activityMonitor1 = new ActivityMonitor();
         rtbChart = new RichTextBox();
         btnOpenLogFolder = new Button();
-        btnUpdateChart = new Button();
         btnUpload = new Button();
         lblUploadResult = new Label();
         cbStartWithWindows = new CheckBox();
+        groupBox1 = new GroupBox();
+        groupBox1.SuspendLayout();
         SuspendLayout();
-        // 
-        // rtbPayload
-        // 
-        rtbPayload.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-        rtbPayload.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-        rtbPayload.Location = new Point(12, 354);
-        rtbPayload.Name = "rtbPayload";
-        rtbPayload.Size = new Size(683, 216);
-        rtbPayload.TabIndex = 3;
-        rtbPayload.Text = "";
         // 
         // activityMonitor1
         // 
@@ -58,35 +48,28 @@ partial class Form1
         // 
         // rtbChart
         // 
-        rtbChart.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        rtbChart.Font = new Font("Consolas", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
-        rtbChart.Location = new Point(12, 144);
+        rtbChart.BackColor = SystemColors.Control;
+        rtbChart.BorderStyle = BorderStyle.None;
+        rtbChart.Dock = DockStyle.Fill;
+        rtbChart.Font = new Font("Consolas", 10.2F, FontStyle.Regular, GraphicsUnit.Point, 0);
+        rtbChart.Location = new Point(10, 30);
         rtbChart.Name = "rtbChart";
-        rtbChart.Size = new Size(683, 204);
+        rtbChart.Size = new Size(663, 122);
         rtbChart.TabIndex = 5;
         rtbChart.Text = "";
         // 
         // btnOpenLogFolder
         // 
-        btnOpenLogFolder.Location = new Point(304, 21);
+        btnOpenLogFolder.Location = new Point(304, 64);
         btnOpenLogFolder.Name = "btnOpenLogFolder";
         btnOpenLogFolder.Size = new Size(150, 29);
         btnOpenLogFolder.TabIndex = 6;
         btnOpenLogFolder.Text = "Open Log Folder";
         btnOpenLogFolder.UseVisualStyleBackColor = true;
         // 
-        // btnUpdateChart
-        // 
-        btnUpdateChart.Location = new Point(304, 56);
-        btnUpdateChart.Name = "btnUpdateChart";
-        btnUpdateChart.Size = new Size(150, 29);
-        btnUpdateChart.TabIndex = 7;
-        btnUpdateChart.Text = "Update Chart";
-        btnUpdateChart.UseVisualStyleBackColor = true;
-        // 
         // btnUpload
         // 
-        btnUpload.Location = new Point(304, 91);
+        btnUpload.Location = new Point(304, 109);
         btnUpload.Name = "btnUpload";
         btnUpload.Size = new Size(150, 29);
         btnUpload.TabIndex = 8;
@@ -96,7 +79,7 @@ partial class Form1
         // lblUploadResult
         // 
         lblUploadResult.AutoSize = true;
-        lblUploadResult.Location = new Point(460, 95);
+        lblUploadResult.Location = new Point(460, 113);
         lblUploadResult.Name = "lblUploadResult";
         lblUploadResult.Size = new Size(67, 20);
         lblUploadResult.TabIndex = 9;
@@ -105,30 +88,41 @@ partial class Form1
         // cbStartWithWindows
         // 
         cbStartWithWindows.AutoSize = true;
-        cbStartWithWindows.Location = new Point(460, 24);
+        cbStartWithWindows.Location = new Point(307, 23);
         cbStartWithWindows.Name = "cbStartWithWindows";
         cbStartWithWindows.Size = new Size(159, 24);
         cbStartWithWindows.TabIndex = 10;
         cbStartWithWindows.Text = "Start with Windows";
         cbStartWithWindows.UseVisualStyleBackColor = true;
         // 
+        // groupBox1
+        // 
+        groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        groupBox1.Controls.Add(rtbChart);
+        groupBox1.Location = new Point(12, 144);
+        groupBox1.Name = "groupBox1";
+        groupBox1.Padding = new Padding(10);
+        groupBox1.Size = new Size(683, 162);
+        groupBox1.TabIndex = 11;
+        groupBox1.TabStop = false;
+        groupBox1.Text = "Today's Activity";
+        // 
         // Form1
         // 
         AutoScaleDimensions = new SizeF(8F, 20F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(707, 582);
+        ClientSize = new Size(707, 318);
+        Controls.Add(groupBox1);
         Controls.Add(cbStartWithWindows);
         Controls.Add(lblUploadResult);
         Controls.Add(btnUpload);
-        Controls.Add(btnUpdateChart);
         Controls.Add(btnOpenLogFolder);
-        Controls.Add(rtbChart);
         Controls.Add(activityMonitor1);
-        Controls.Add(rtbPayload);
         Icon = (Icon)resources.GetObject("$this.Icon");
         Name = "Form1";
         StartPosition = FormStartPosition.CenterScreen;
         Text = "Time Bin Tracker";
+        groupBox1.ResumeLayout(false);
         ResumeLayout(false);
         PerformLayout();
     }
@@ -138,8 +132,8 @@ partial class Form1
     private ActivityMonitor activityMonitor1;
     private RichTextBox rtbChart;
     private Button btnOpenLogFolder;
-    private Button btnUpdateChart;
     private Button btnUpload;
     private Label lblUploadResult;
     private CheckBox cbStartWithWindows;
+    private GroupBox groupBox1;
 }
