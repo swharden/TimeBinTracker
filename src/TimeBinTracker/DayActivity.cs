@@ -6,7 +6,7 @@ namespace TimeBinTracker;
 
 public class DayActivity
 {
-    public const int BINS_PER_HOUR = 6;
+    public const int BINS_PER_HOUR = 4;
     public const int HOURS_PER_DAY = 24;
     public const int BINS_PER_DAY = BINS_PER_HOUR * HOURS_PER_DAY;
     readonly bool[] Activity = new bool[BINS_PER_DAY];
