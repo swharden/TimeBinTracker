@@ -4,36 +4,11 @@ namespace TimeBinTracker;
 
 internal class Report()
 {
-    public static void Generate(string logFolder, string outputFile = "report.html")
+    public static void Generate(List<DayActivity> days, string outputFile = "report.html")
     {
-        // Populate all days in memory
-        List<DayActivity> days = [];
-        foreach (string dayFolder in Directory.GetDirectories(logFolder))
-        {
-            days.Add(new DayActivity(dayFolder));
-        }
-
-        // Add blanks for missing days
-        DateOnly[] daysSeen = days.Select(x => x.Day).ToArray();
-        DateOnly firstDay = days.Min(x => x.Day);
-        DateOnly lastDay = days.Max(x => x.Day);
-        int daysCovered = lastDay.DayNumber - firstDay.DayNumber;
-        for (int i = 0; i < daysCovered; i++)
-        {
-            DateOnly date = firstDay.AddDays(i);
-            if (!daysSeen.Contains(date))
-            {
-                days.Add(new DayActivity(date));
-            }
-        }
-
-        // Generate the report on sorted data with empty days
         StringBuilder sb = new();
-        foreach (DayActivity day in days.OrderBy(x => x.Day))
+        foreach (DayActivity day in days)
         {
-            Console.WriteLine();
-            Console.WriteLine(day.GetDayCode());
-            Console.WriteLine(day.ToChart());
             sb.AppendLine(GetDayHtml(day));
         }
 

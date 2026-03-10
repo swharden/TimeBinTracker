@@ -40,4 +40,31 @@ internal class Import
 
         return day;
     }
+
+    public static List<DayActivity> LoadDays(string logFolder)
+    {
+        // Populate all days in memory
+        List<DayActivity> days = [];
+        foreach (string dayFolder in Directory.GetDirectories(logFolder))
+        {
+            days.Add(new DayActivity(dayFolder));
+        }
+
+        // Add blanks for missing days
+        DateOnly[] daysSeen = days.Select(x => x.Day).ToArray();
+        DateOnly firstDay = days.Min(x => x.Day);
+        DateOnly lastDay = days.Max(x => x.Day);
+        int daysCovered = lastDay.DayNumber - firstDay.DayNumber;
+        for (int i = 0; i < daysCovered; i++)
+        {
+            DateOnly date = firstDay.AddDays(i);
+            if (!daysSeen.Contains(date))
+            {
+                days.Add(new DayActivity(date));
+            }
+        }
+
+        return days.OrderBy(x => x.Day).ToList();
+    }
+
 }
