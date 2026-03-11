@@ -44,6 +44,7 @@
 
         .page {
             width: fit-content;
+            max-width: 100%;
             margin: 0 auto;
             padding: 32px 20px 64px;
         }
@@ -525,7 +526,7 @@
 
             // Update subtitle with actual date range
             document.getElementById('subtitle').textContent =
-                `${formatDateRange(data)} · ${data.length} days · 15-minute bins`;
+                `${formatDateRange(data)} · ${data.length} days`;
 
             // Read CSS variable values for JS layout calculations
             const rootStyle = getComputedStyle(document.documentElement);
