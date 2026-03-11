@@ -5,27 +5,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Activity Calendar</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&display=swap"
-        rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0f0d;
-            --surface: #111914;
-            --border: #1e2e22;
-            --text-dim: #3d5c45;
-            --text-mid: #6b9475;
-            --text: #c8e6d0;
-            --text-bright: #e8f5eb;
-            --green-0: #0a0f0d;
-            --green-1: #143d1e;
-            --green-2: #1a6b30;
-            --green-3: #22a845;
-            --green-4: #2ecc5a;
-            --accent: #39ff82;
+            --bg: #ffffff;
+            --bg-secondary: #f6f8fa;
+            --border: #d1d9e0;
+            --border-light: #e8ecf0;
+            --text: #1f2328;
+            --text-secondary: #656d76;
+            --text-tertiary: #8b949e;
+            --green-0: #ebedf0;
+            --green-1: #9be9a8;
+            --green-2: #40c463;
+            --green-3: #30a14e;
+            --green-4: #216e39;
+            --accent: #1a7f37;
             --hour-w: 10px;
-            --hour-h: 28px;
+            --hour-h: 26px;
             --gap: 2px;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
         }
 
         * {
@@ -37,72 +36,63 @@
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'JetBrains Mono', monospace;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            line-height: 1.5;
             min-height: 100vh;
-            padding: 48px 40px;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(46, 204, 90, 0.06) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
         }
 
         .page {
-            position: relative;
-            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 32px 24px 64px;
         }
 
+        /* Header */
         header {
-            margin-bottom: 52px;
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
         }
 
         .header-eyebrow {
-            font-size: 10px;
-            letter-spacing: 0.25em;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            margin-bottom: 10px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
         }
 
         h1 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: clamp(28px, 4vw, 48px);
-            font-weight: 700;
-            color: var(--text-bright);
-            letter-spacing: -0.03em;
-            line-height: 1;
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            line-height: 1.25;
         }
 
-        h1 span {
-            color: var(--accent);
-        }
+            h1 span {
+                color: var(--accent);
+            }
 
         .subtitle {
-            margin-top: 12px;
-            font-size: 12px;
-            color: var(--text-mid);
-            letter-spacing: 0.05em;
+            margin-top: 6px;
+            font-size: 14px;
+            color: var(--text-secondary);
         }
 
         /* Time axis */
         .time-axis-row {
             display: flex;
             align-items: center;
-            margin-bottom: 6px;
-            padding-left: 156px;
+            margin-bottom: 4px;
+            padding-left: 140px;
         }
 
         .time-label {
-            font-size: 9px;
-            color: var(--text-dim);
-            letter-spacing: 0.05em;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-tertiary);
+            letter-spacing: 0.02em;
             width: 0;
             white-space: nowrap;
             overflow: visible;
@@ -113,80 +103,75 @@
             display: inline-block;
         }
 
+        /* Scroll wrapper for bins on small screens */
+        .calendar-scroll {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .calendar-inner {
+            min-width: fit-content;
+        }
+
         /* Week group */
         .week-group {
-            margin-bottom: 32px;
-            animation: fadeUp 0.5s ease both;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .week-group:nth-child(1) {
-            animation-delay: 0.05s;
-        }
-
-        .week-group:nth-child(2) {
-            animation-delay: 0.15s;
-        }
-
-        .week-group:nth-child(3) {
-            animation-delay: 0.25s;
+            margin-bottom: 24px;
         }
 
         .week-header {
-            font-size: 9px;
-            letter-spacing: 0.2em;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
             text-transform: uppercase;
-            color: var(--text-dim);
-            margin-bottom: 10px;
-            padding-left: 156px;
-            border-top: 1px solid var(--border);
-            padding-top: 10px;
+            letter-spacing: 0.06em;
+            margin-bottom: 8px;
+            padding-left: 140px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .week-group:first-child .week-header {
+            border-top: none;
+            padding-top: 0;
         }
 
         /* Day row */
         .day-row {
             display: flex;
             align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
+            .day-row:hover {
+                background: var(--bg-secondary);
+                border-radius: 6px;
+            }
+
         .day-label {
-            width: 156px;
+            width: 140px;
             flex-shrink: 0;
             display: flex;
             align-items: baseline;
-            gap: 10px;
+            gap: 8px;
+            padding-left: 8px;
         }
 
         .day-name {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 600;
-            color: var(--text-mid);
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            width: 32px;
+            color: var(--text);
+            width: 30px;
         }
 
         .day-date {
-            font-size: 10px;
-            color: var(--text-dim);
-            letter-spacing: 0.04em;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-tertiary);
         }
 
-        .day-date .day-num {
-            color: var(--text-mid);
-        }
+            .day-date .day-num {
+                color: var(--text-secondary);
+            }
 
         /* Bins container */
         .bins {
@@ -195,15 +180,15 @@
             align-items: center;
         }
 
-        /* Hour group (4 bins) with subtle separator every 4 hours */
+        /* Hour group (4 bins) */
         .hour-group {
             display: flex;
             gap: var(--gap);
         }
 
-        .hour-group+.hour-group {
-            margin-left: 4px;
-        }
+            .hour-group + .hour-group {
+                margin-left: 3px;
+            }
 
         /* Individual bin */
         .bin {
@@ -211,112 +196,203 @@
             height: var(--hour-h);
             border-radius: 2px;
             flex-shrink: 0;
-            transition: transform 0.1s ease, filter 0.1s ease;
+            transition: transform 0.1s ease;
             cursor: default;
             position: relative;
         }
 
-        .bin:hover {
-            transform: scaleY(1.25);
-            filter: brightness(1.4);
-            z-index: 10;
-        }
+            .bin:hover {
+                transform: scaleY(1.3);
+                z-index: 10;
+            }
 
-        .bin[data-active="0"] {
-            background: var(--green-0);
-            border: 1px solid var(--border);
-        }
+            .bin[data-active="0"] {
+                background: var(--green-0);
+            }
 
-        .bin[data-active="1"] {
-            background: var(--green-3);
-            box-shadow: 0 0 6px rgba(34, 168, 69, 0.4);
-        }
+            .bin[data-active="1"] {
+                background: var(--green-3);
+            }
 
-        /* Tooltip */
-        .bin::after {
-            content: attr(data-tip);
-            position: absolute;
-            bottom: calc(100% + 6px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1a2e1e;
-            border: 1px solid var(--border);
-            color: var(--text);
-            font-size: 9px;
-            white-space: nowrap;
-            padding: 3px 7px;
-            border-radius: 3px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.15s;
-            z-index: 100;
-        }
+            /* Tooltip */
+            .bin::after {
+                content: attr(data-tip);
+                position: absolute;
+                bottom: calc(100% + 8px);
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--text);
+                color: var(--bg);
+                font-family: var(--font-mono);
+                font-size: 11px;
+                white-space: nowrap;
+                padding: 4px 8px;
+                border-radius: 6px;
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.12s;
+                z-index: 100;
+            }
 
-        .bin:hover::after {
-            opacity: 1;
-        }
+            .bin::before {
+                content: '';
+                position: absolute;
+                bottom: calc(100% + 4px);
+                left: 50%;
+                transform: translateX(-50%);
+                border: 4px solid transparent;
+                border-top-color: var(--text);
+                pointer-events: none;
+                opacity: 0;
+                transition: opacity 0.12s;
+                z-index: 100;
+            }
+
+            .bin:hover::after,
+            .bin:hover::before {
+                opacity: 1;
+            }
 
         /* Activity count */
         .day-count {
             margin-left: 12px;
-            font-size: 9px;
-            color: var(--text-dim);
-            letter-spacing: 0.05em;
-            min-width: 40px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-tertiary);
+            min-width: 48px;
         }
 
-        .day-count span {
-            color: var(--green-3);
-        }
+            .day-count span {
+                color: var(--accent);
+                font-weight: 600;
+            }
 
         /* Legend */
         .legend {
-            margin-top: 48px;
+            margin-top: 32px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 10px;
-            color: var(--text-dim);
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-tertiary);
         }
 
         .legend-bins {
             display: flex;
-            gap: 3px;
+            gap: 2px;
             align-items: center;
         }
 
         .legend-bin {
             width: 10px;
-            height: 16px;
+            height: 10px;
             border-radius: 2px;
         }
 
-        .legend-bin.off {
-            background: var(--green-0);
-            border: 1px solid var(--border);
-        }
+            .legend-bin.off {
+                background: var(--green-0);
+            }
 
-        .legend-bin.on {
-            background: var(--green-3);
-        }
+            .legend-bin.on {
+                background: var(--green-3);
+            }
 
+        /* Stats */
         .stats-bar {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid var(--border);
+            margin-top: 24px;
+            padding: 20px 24px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
             display: flex;
-            gap: 32px;
-            font-size: 10px;
-            color: var(--text-dim);
+            gap: 40px;
+            flex-wrap: wrap;
         }
+
+            .stats-bar > div {
+                font-size: 12px;
+                color: var(--text-secondary);
+            }
 
         .stat-val {
-            font-size: 18px;
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-            color: var(--accent);
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text);
             display: block;
-            line-height: 1.2;
+            line-height: 1.3;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page {
+                padding: 20px 16px 48px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .time-axis-row {
+                padding-left: 100px;
+            }
+
+            .day-label {
+                width: 100px;
+            }
+
+            .day-date {
+                display: none;
+            }
+
+            .stats-bar {
+                gap: 24px;
+                padding: 16px;
+            }
+
+            .stat-val {
+                font-size: 20px;
+            }
+
+            .week-header {
+                padding-left: 100px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page {
+                padding: 16px 12px 40px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .time-axis-row {
+                padding-left: 72px;
+            }
+
+            .day-label {
+                width: 72px;
+                padding-left: 4px;
+            }
+
+            .day-name {
+                font-size: 11px;
+            }
+
+            .day-count {
+                display: none;
+            }
+
+            .week-header {
+                padding-left: 72px;
+                font-size: 10px;
+            }
+
+            .stats-bar {
+                gap: 20px;
+            }
         }
     </style>
 </head>
@@ -326,17 +402,21 @@
         <header>
             <div class="header-eyebrow">15-min resolution · 96 bins/day</div>
             <h1>Activity <span>Log</span></h1>
-            <div class="subtitle">Mar 02 – Mar 10, 2026 &nbsp;·&nbsp; daily activity bins</div>
+            <div class="subtitle">Mar 02 – Mar 10, 2026 · daily activity bins</div>
         </header>
 
-        <div id="calendar"></div>
+        <div class="calendar-scroll">
+            <div class="calendar-inner" id="calendar"></div>
+        </div>
 
         <div class="legend">
+            <span>Less</span>
             <div class="legend-bins">
                 <div class="legend-bin off"></div>
                 <div class="legend-bin on"></div>
             </div>
-            inactive &nbsp;/&nbsp; active &nbsp;·&nbsp; each square = 15 min
+            <span>More</span>
+            <span style="margin-left: 8px; border-left: 1px solid var(--border); padding-left: 12px;">Each square = 15 min</span>
         </div>
 
         <div class="stats-bar" id="stats"></div>
@@ -540,14 +620,12 @@
             { "date": "2026-03-08", "hex": "0000F81F073CFE8F7F783000" },
             { "date": "2026-03-09", "hex": "0000F0FB01E0037FFFF90703" },
             { "date": "2026-03-10", "hex": "0000F03FFEFFFBFF0F0E0000" }
-        ]
+        ];
 
         const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         function hexToBits(hex) {
-            // Each hex char → 4 bits, total 24 chars → 96 bits
-            // Bits are LSB-first within each byte
             const bits = [];
             for (let i = 0; i < hex.length; i += 2) {
                 const byte = parseInt(hex.slice(i, i + 2), 16);
@@ -555,7 +633,7 @@
                     bits.push((byte >> b) & 1);
                 }
             }
-            return bits; // 96 bits, bin 0 = midnight
+            return bits;
         }
 
         function formatTime(binIndex) {
@@ -575,18 +653,15 @@
             return `${h - 12}p`;
         }
 
-        // Group days by week (Mon–Sun)
         function getWeekKey(dateStr) {
             const d = new Date(dateStr + 'T12:00:00');
-            const day = d.getDay(); // 0=Sun
-            // Week starts Monday
+            const day = d.getDay();
             const diff = (day === 0) ? -6 : 1 - day;
             const mon = new Date(d);
             mon.setDate(d.getDate() + diff);
             return mon.toISOString().slice(0, 10);
         }
 
-        // Build weeks map
         const weeks = new Map();
         DATA.forEach(entry => {
             const wk = getWeekKey(entry.date);
@@ -594,20 +669,15 @@
             weeks.get(wk).push(entry);
         });
 
-        // Time axis
         const cal = document.getElementById('calendar');
 
         // Time axis header
         const axisRow = document.createElement('div');
         axisRow.className = 'time-axis-row';
-
-        // 24 hours, each hour = 4 bins at (10+2)px each + 4px group margin
-        // We'll place labels at every 4 hours
         let axisHTML = '';
         for (let g = 0; g < 24; g++) {
-            const marginL = g > 0 ? '4px' : '0';
-            // each group = 4 bins * 12px + 3 gaps * 2px = 48+6 = 54px  
-            const groupW = 4 * 10 + 3 * 2; // 46px
+            const marginL = g > 0 ? '3px' : '0';
+            const groupW = 4 * 10 + 3 * 2;
             if (g % 4 === 0) {
                 axisHTML += `<div class="time-label" style="width:${groupW}px;margin-left:${marginL}">${formatHour(g * 4)}</div>`;
             } else {
@@ -622,8 +692,6 @@
 
         weeks.forEach((entries, weekKey) => {
             const wkDate = new Date(weekKey + 'T12:00:00');
-            const wkEnd = new Date(wkDate);
-            wkEnd.setDate(wkDate.getDate() + 6);
 
             const weekDiv = document.createElement('div');
             weekDiv.className = 'week-group';
@@ -644,15 +712,14 @@
                 const dayLabel = document.createElement('div');
                 dayLabel.className = 'day-label';
                 dayLabel.innerHTML = `
-      <div class="day-name">${DAY_NAMES[d.getDay()]}</div>
-      <div class="day-date">${MONTH_NAMES[d.getMonth()]} <span class="day-num">${d.getDate()}</span></div>
-    `;
+                        <div class="day-name">${DAY_NAMES[d.getDay()]}</div>
+                        <div class="day-date">${MONTH_NAMES[d.getMonth()]} <span class="day-num">${d.getDate()}</span></div>
+                    `;
                 dayRow.appendChild(dayLabel);
 
                 const binsDiv = document.createElement('div');
                 binsDiv.className = 'bins';
 
-                // Group into 24 hour-groups of 4 bins each
                 for (let h = 0; h < 24; h++) {
                     const hGroup = document.createElement('div');
                     hGroup.className = 'hour-group';
@@ -662,7 +729,7 @@
                         const bin = document.createElement('div');
                         bin.className = 'bin';
                         bin.dataset.active = active;
-                        bin.dataset.tip = `${formatTime(idx)}–${formatTime(idx + 1)} · ${active ? '●' : '○'}`;
+                        bin.dataset.tip = `${formatTime(idx)}–${formatTime(idx + 1)} · ${active ? 'Active' : 'Inactive'}`;
                         hGroup.appendChild(bin);
                     }
                     binsDiv.appendChild(hGroup);
@@ -688,10 +755,10 @@
         const totalMins = (totalActive * 15) % 60;
         const pct = Math.round(totalActive / totalBins * 100);
         document.getElementById('stats').innerHTML = `
-  <div><span class="stat-val">${totalHrs}h ${totalMins}m</span>total active time</div>
-  <div><span class="stat-val">${pct}%</span>of tracked period</div>
-  <div><span class="stat-val">${DATA.length}</span>days recorded</div>
-`;
+                <div><span class="stat-val">${totalHrs}h ${totalMins}m</span>Total active time</div>
+                <div><span class="stat-val">${pct}%</span>Of tracked period</div>
+                <div><span class="stat-val">${DATA.length}</span>Days recorded</div>
+            `;
     </script>
 </body>
 
