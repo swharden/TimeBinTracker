@@ -20,9 +20,9 @@
             --green-3: #30a14e;
             --green-4: #216e39;
             --accent: #1a7f37;
-            --hour-w: 6px;
+            --hour-w: 5px;
             --hour-h: 18px;
-            --gap: 1px;
+            --gap: 0px;
             --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
             --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
         }
@@ -216,14 +216,14 @@
         /* Bins container */
         .bins {
             display: flex;
-            gap: var(--gap);
+            gap: 0;
             align-items: center;
         }
 
         /* Hour group (4 bins) */
         .hour-group {
             display: flex;
-            gap: var(--gap);
+            gap: 0;
         }
 
             .hour-group + .hour-group {
@@ -424,7 +424,7 @@
 
         @media (max-width: 420px) {
             :root {
-                --hour-w: 4px;
+                --hour-w: 3px;
                 --hour-h: 14px;
             }
 
@@ -455,6 +455,14 @@
 
             .hour-group + .hour-group {
                 margin-left: 1px;
+            }
+
+            .bin[data-work-start] {
+                box-shadow: -1px 0 0 0 var(--text);
+            }
+
+            .bin[data-work-end] {
+                box-shadow: 1px 0 0 0 var(--text);
             }
         }
     </style>
@@ -552,7 +560,6 @@
             // Read CSS variable values for JS layout calculations
             const rootStyle = getComputedStyle(document.documentElement);
             const BIN_W = parseInt(rootStyle.getPropertyValue('--hour-w'));
-            const BIN_GAP = parseInt(rootStyle.getPropertyValue('--gap'));
             const GROUP_MARGIN = 2;
 
             // Group days by week
@@ -567,7 +574,7 @@
             const axisRow = document.createElement('div');
             axisRow.className = 'time-axis-row';
             let axisHTML = '';
-            const groupW = 4 * BIN_W + 3 * BIN_GAP;
+            const groupW = 4 * BIN_W;
             for (let g = 0; g < 24; g++) {
                 const marginL = g > 0 ? `${GROUP_MARGIN}px` : '0';
                 if (g % 4 === 0) {
