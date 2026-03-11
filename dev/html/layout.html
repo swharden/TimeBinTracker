@@ -1,1058 +1,698 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Time Bin Tracker</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Calendar</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600&family=Space+Grotesk:wght@300;500;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --active: #2da44e;
-            --idle: #dee2e6;
+            --bg: #0a0f0d;
+            --surface: #111914;
+            --border: #1e2e22;
+            --text-dim: #3d5c45;
+            --text-mid: #6b9475;
+            --text: #c8e6d0;
+            --text-bright: #e8f5eb;
+            --green-0: #0a0f0d;
+            --green-1: #143d1e;
+            --green-2: #1a6b30;
+            --green-3: #22a845;
+            --green-4: #2ecc5a;
+            --accent: #39ff82;
+            --hour-w: 10px;
+            --hour-h: 28px;
+            --gap: 2px;
         }
 
-        .sq {
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            min-height: 100vh;
+            padding: 48px 40px;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(46, 204, 90, 0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            margin-bottom: 52px;
+        }
+
+        .header-eyebrow {
+            font-size: 10px;
+            letter-spacing: 0.25em;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(28px, 4vw, 48px);
+            font-weight: 700;
+            color: var(--text-bright);
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+
+        h1 span {
+            color: var(--accent);
+        }
+
+        .subtitle {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-mid);
+            letter-spacing: 0.05em;
+        }
+
+        /* Time axis */
+        .time-axis-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            padding-left: 156px;
+        }
+
+        .time-label {
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+            width: 0;
+            white-space: nowrap;
+            overflow: visible;
             display: inline-block;
-            width: 6px;
-            height: 20px;
-            vertical-align: top;
-            border: 1px solid rgba(0, 0, 0, .05)
         }
 
-        .sq-0 {
-            background-color: var(--idle);
+        .time-spacer {
+            display: inline-block;
         }
 
-        .sq-1 {
-            background-color: var(--active);
+        /* Week group */
+        .week-group {
+            margin-bottom: 32px;
+            animation: fadeUp 0.5s ease both;
         }
 
-        .sq-day {
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .week-group:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .week-group:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .week-group:nth-child(3) {
+            animation-delay: 0.25s;
+        }
+
+        .week-header {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            padding-left: 156px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
+
+        /* Day row */
+        .day-row {
             display: flex;
+            align-items: center;
+            margin-bottom: 5px;
         }
 
-        .sq-hour {
+        .day-label {
+            width: 156px;
+            flex-shrink: 0;
             display: flex;
-            /*outline: 1px solid rgba(0, 0, 0, .1)*/
+            align-items: baseline;
+            gap: 10px;
         }
 
-        /* hour workday starts */
-        .sq-hour:nth-of-type(9) {
-            border-left: 2px solid rgba(0, 0, 0, 1);
+        .day-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-mid);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            width: 32px;
         }
 
-        /* hour workday ends */
-        .sq-hour:nth-of-type(17) {
-            border-right: 2px solid rgba(0, 0, 0, 1);
+        .day-date {
+            font-size: 10px;
+            color: var(--text-dim);
+            letter-spacing: 0.04em;
+        }
+
+        .day-date .day-num {
+            color: var(--text-mid);
+        }
+
+        /* Bins container */
+        .bins {
+            display: flex;
+            gap: var(--gap);
+            align-items: center;
+        }
+
+        /* Hour group (4 bins) with subtle separator every 4 hours */
+        .hour-group {
+            display: flex;
+            gap: var(--gap);
+        }
+
+        .hour-group+.hour-group {
+            margin-left: 4px;
+        }
+
+        /* Individual bin */
+        .bin {
+            width: var(--hour-w);
+            height: var(--hour-h);
+            border-radius: 2px;
+            flex-shrink: 0;
+            transition: transform 0.1s ease, filter 0.1s ease;
+            cursor: default;
+            position: relative;
+        }
+
+        .bin:hover {
+            transform: scaleY(1.25);
+            filter: brightness(1.4);
+            z-index: 10;
+        }
+
+        .bin[data-active="0"] {
+            background: var(--green-0);
+            border: 1px solid var(--border);
+        }
+
+        .bin[data-active="1"] {
+            background: var(--green-3);
+            box-shadow: 0 0 6px rgba(34, 168, 69, 0.4);
+        }
+
+        /* Tooltip */
+        .bin::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a2e1e;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-size: 9px;
+            white-space: nowrap;
+            padding: 3px 7px;
+            border-radius: 3px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s;
+            z-index: 100;
+        }
+
+        .bin:hover::after {
+            opacity: 1;
+        }
+
+        /* Activity count */
+        .day-count {
+            margin-left: 12px;
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.05em;
+            min-width: 40px;
+        }
+
+        .day-count span {
+            color: var(--green-3);
+        }
+
+        /* Legend */
+        .legend {
+            margin-top: 48px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .legend-bins {
+            display: flex;
+            gap: 3px;
+            align-items: center;
+        }
+
+        .legend-bin {
+            width: 10px;
+            height: 16px;
+            border-radius: 2px;
+        }
+
+        .legend-bin.off {
+            background: var(--green-0);
+            border: 1px solid var(--border);
+        }
+
+        .legend-bin.on {
+            background: var(--green-3);
+        }
+
+        .stats-bar {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 32px;
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .stat-val {
+            font-size: 18px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            color: var(--accent);
+            display: block;
+            line-height: 1.2;
         }
     </style>
 </head>
 
 <body>
-    <div class="container-fluid my-5">
-        <h1 class="text-center">Time Bin Tracker</h1>
+    <div class="page">
+        <header>
+            <div class="header-eyebrow">15-min resolution · 96 bins/day</div>
+            <h1>Activity <span>Log</span></h1>
+            <div class="subtitle">Mar 02 – Mar 10, 2026 &nbsp;·&nbsp; daily activity bins</div>
+        </header>
 
-        <section class="my-4 lh-lg">
-            <div class="fw-semibold">Week of 2025-09-08</div>
-            <div class="d-flex align-items-center gap-2">
-                <div>2025-12-12 M (8.5 hr)</div>
+        <div id="calendar"></div>
 
-                <div class="sq-day">
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                </div>
+        <div class="legend">
+            <div class="legend-bins">
+                <div class="legend-bin off"></div>
+                <div class="legend-bin on"></div>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <div>2025-12-12 M (8.5 hr)</div>
+            inactive &nbsp;/&nbsp; active &nbsp;·&nbsp; each square = 15 min
+        </div>
 
-                <div class="sq-day">
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <div>2025-12-12 M (8.5 hr)</div>
-
-                <div class="sq-day">
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <div>2025-12-12 M (8.5 hr)</div>
-
-                <div class="sq-day">
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <div>2025-12-12 M (8.5 hr)</div>
-
-                <div class="sq-day">
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                    <div class="sq-hour">
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-0"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-1"></span>
-                        <span class="sq sq-0"></span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+        <div class="stats-bar" id="stats"></div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
+
+    <script>
+        const DATA = [
+            { "date": "2025-08-27", "hex": "00000000FCFFFDFFFFFF0100" },
+            { "date": "2025-08-28", "hex": "00000000F0FFFBFF7F000000" },
+            { "date": "2025-08-29", "hex": "00000000FCFFFFFF01000000" },
+            { "date": "2025-08-30", "hex": "000000000000000000000000" },
+            { "date": "2025-08-31", "hex": "000000000000000000000000" },
+            { "date": "2025-09-01", "hex": "000000000000000000000000" },
+            { "date": "2025-09-02", "hex": "00000000F87FFBFFFF000000" },
+            { "date": "2025-09-03", "hex": "00000000F87FF1FFFF000000" },
+            { "date": "2025-09-04", "hex": "00000000F8FFFEFF3F000000" },
+            { "date": "2025-09-05", "hex": "00000000F0FFFFFF3F000000" },
+            { "date": "2025-09-06", "hex": "000000000000020000000000" },
+            { "date": "2025-09-07", "hex": "000000000000000000080000" },
+            { "date": "2025-09-08", "hex": "00000000F8FFE1FFFF030000" },
+            { "date": "2025-09-09", "hex": "00000000F8FFFFFFFFF80000" },
+            { "date": "2025-09-10", "hex": "00000000FCFFFFFFFFCF0000" },
+            { "date": "2025-09-11", "hex": "00000030FEFFFFFFFFBF2300" },
+            { "date": "2025-09-12", "hex": "2000E07FFFFFFFFF3F000000" },
+            { "date": "2025-09-13", "hex": "000000000000000000000000" },
+            { "date": "2025-09-14", "hex": "0000000000F0FF0300000000" },
+            { "date": "2025-09-15", "hex": "00000000FEFFFFFFFF000000" },
+            { "date": "2025-09-16", "hex": "00000000F0FFFBFF7F0F0000" },
+            { "date": "2025-09-17", "hex": "00000000FCFFFFFF7F000000" },
+            { "date": "2025-09-18", "hex": "00000000F8FFFFFFFF3F0000" },
+            { "date": "2025-09-19", "hex": "0000003FF0FFFFFFFF1F0000" },
+            { "date": "2025-09-20", "hex": "0000000000F0FF0F3EFFFF00" },
+            { "date": "2025-09-21", "hex": "000000F00FFF3FFEF03F0000" },
+            { "date": "2025-09-22", "hex": "00000000FFFFFFFFFF070000" },
+            { "date": "2025-09-23", "hex": "000000F0FFFFFFFFFF010000" },
+            { "date": "2025-09-24", "hex": "00000000FFFFFF7F00000000" },
+            { "date": "2025-09-25", "hex": "00000000FEFFFFFFFF000000" },
+            { "date": "2025-09-26", "hex": "000000FCFFFFFFFFFF000000" },
+            { "date": "2025-09-27", "hex": "00000000FEFFFF4300000000" },
+            { "date": "2025-09-28", "hex": "0000000007F01FFE03000000" },
+            { "date": "2025-09-29", "hex": "00000000FEFFFFFFFF010000" },
+            { "date": "2025-09-30", "hex": "000000E0FFFFFFFFFF030000" },
+            { "date": "2025-10-01", "hex": "00000000F8FFFFFFFF3F0000" },
+            { "date": "2025-10-02", "hex": "00000000F8FFFFFFFF000000" },
+            { "date": "2025-10-03", "hex": "00000000FFFFFFFFFF3F0000" },
+            { "date": "2025-10-04", "hex": "00000000FC1FC03FFC0F0000" },
+            { "date": "2025-10-05", "hex": "00000000E0FFFF0F80DF0000" },
+            { "date": "2025-10-06", "hex": "00000000F8FFFFFFFFF0FF3F" },
+            { "date": "2025-10-07", "hex": "000000FCFFFFFFFFFF010000" },
+            { "date": "2025-10-08", "hex": "000000E0FFFFFFFFFFFF0100" },
+            { "date": "2025-10-09", "hex": "00000000FCFFFFFFFF1F0000" },
+            { "date": "2025-10-10", "hex": "000000000000000000000000" },
+            { "date": "2025-10-11", "hex": "000000000000000000000000" },
+            { "date": "2025-10-12", "hex": "000000000000000000000000" },
+            { "date": "2025-10-13", "hex": "000000BFFDFFFFFFFF010000" },
+            { "date": "2025-10-14", "hex": "00000000FEFFFFFFFFFF0000" },
+            { "date": "2025-10-15", "hex": "00000000FEFFFF87FFFF6700" },
+            { "date": "2025-10-16", "hex": "00000000FFFFFFFF0F000000" },
+            { "date": "2025-10-17", "hex": "000000000000000000000000" },
+            { "date": "2025-10-18", "hex": "000000000000000000000000" },
+            { "date": "2025-10-19", "hex": "000000000000000000000000" },
+            { "date": "2025-10-20", "hex": "00000000FCFFFFFFFF1F0000" },
+            { "date": "2025-10-21", "hex": "000000E0FFFFFFFFFFFF7800" },
+            { "date": "2025-10-22", "hex": "00000000FEFFFFFFFF030000" },
+            { "date": "2025-10-23", "hex": "00000000FEFFFBFFFF2F0000" },
+            { "date": "2025-10-24", "hex": "000000F0FFFFFFFF0F00E003" },
+            { "date": "2025-10-25", "hex": "0000000000FF3F307F000000" },
+            { "date": "2025-10-26", "hex": "0000000000E0FFFFFF010000" },
+            { "date": "2025-10-27", "hex": "00000000FCFFFFFF7FE00000" },
+            { "date": "2025-10-28", "hex": "00000000F8FFFFFFFF000000" },
+            { "date": "2025-10-29", "hex": "00000000F8FFFFFFFF0F0000" },
+            { "date": "2025-10-30", "hex": "000080FFBFFFF9FF00000000" },
+            { "date": "2025-10-31", "hex": "00000000F8FFFBFFFF001800" },
+            { "date": "2025-11-01", "hex": "00000000000F000000000000" },
+            { "date": "2025-11-02", "hex": "000000000000000000000000" },
+            { "date": "2025-11-03", "hex": "00000038FEFFFBFF3F000000" },
+            { "date": "2025-11-04", "hex": "00000000F8FFFCFF3F000000" },
+            { "date": "2025-11-05", "hex": "00000000F0FFEFFF1F000000" },
+            { "date": "2025-11-06", "hex": "00000000F0FFFBFF3F000000" },
+            { "date": "2025-11-07", "hex": "00000000FCFFFFFF0F000000" },
+            { "date": "2025-11-08", "hex": "000000000000000000000000" },
+            { "date": "2025-11-09", "hex": "000000000000000000000000" },
+            { "date": "2025-11-10", "hex": "000000000000000000000000" },
+            { "date": "2025-11-11", "hex": "00000000FCFFFFFF3F000000" },
+            { "date": "2025-11-12", "hex": "00000000F8FFFFFF1F000000" },
+            { "date": "2025-11-13", "hex": "00000000FEFFFFFFFF000000" },
+            { "date": "2025-11-14", "hex": "00000000F8FFEFFF3F000000" },
+            { "date": "2025-11-15", "hex": "000000000000000000000000" },
+            { "date": "2025-11-16", "hex": "000000000000000000000000" },
+            { "date": "2025-11-17", "hex": "00000000F0FFFFFF7FF20100" },
+            { "date": "2025-11-18", "hex": "000000000000000000070000" },
+            { "date": "2025-11-19", "hex": "000080FFFFFFFFFFFF4B0000" },
+            { "date": "2025-11-20", "hex": "000000000000000000000000" },
+            { "date": "2025-11-21", "hex": "000000000000000000000000" },
+            { "date": "2025-11-22", "hex": "000000000000000000000000" },
+            { "date": "2025-11-23", "hex": "000000000000000000000000" },
+            { "date": "2025-11-24", "hex": "000000E0FFFFFFFF3F000000" },
+            { "date": "2025-11-25", "hex": "00000000FCFFFFFF3F000000" },
+            { "date": "2025-11-26", "hex": "00000000F8FFFDFF3F000000" },
+            { "date": "2025-11-27", "hex": "000000000000000000000000" },
+            { "date": "2025-11-28", "hex": "000000000000000000000000" },
+            { "date": "2025-11-29", "hex": "000000000000000000000000" },
+            { "date": "2025-11-30", "hex": "00000000000000000000FF07" },
+            { "date": "2025-12-01", "hex": "00000000E0FFFFFF3F000000" },
+            { "date": "2025-12-02", "hex": "00000080FFFFFFFFFF7F0000" },
+            { "date": "2025-12-03", "hex": "00000000F8FFFFFF1F000000" },
+            { "date": "2025-12-04", "hex": "000000E0FFFFFFFFFF870000" },
+            { "date": "2025-12-05", "hex": "000000000000000000000000" },
+            { "date": "2025-12-06", "hex": "000000000000000000000000" },
+            { "date": "2025-12-07", "hex": "000000000000000000000000" },
+            { "date": "2025-12-08", "hex": "00000000FCFFFFFFFF336E00" },
+            { "date": "2025-12-09", "hex": "00000000FCFFFF3FE01F0004" },
+            { "date": "2025-12-10", "hex": "00001080FFBFFFFFFFFF0100" },
+            { "date": "2025-12-11", "hex": "000000000000000000000000" },
+            { "date": "2025-12-12", "hex": "00000000F0FFFFFFFF000000" },
+            { "date": "2025-12-13", "hex": "000000000000C0FF0F000000" },
+            { "date": "2025-12-14", "hex": "000000000000000000000000" },
+            { "date": "2025-12-15", "hex": "00000000B8FFFFFFFF1F0000" },
+            { "date": "2025-12-16", "hex": "00000000F8FF010000000000" },
+            { "date": "2025-12-17", "hex": "000000000000000000000000" },
+            { "date": "2025-12-18", "hex": "000000000000000000000000" },
+            { "date": "2025-12-19", "hex": "000000000000000000000000" },
+            { "date": "2025-12-20", "hex": "000000000000000000000000" },
+            { "date": "2025-12-21", "hex": "000000000000000000000000" },
+            { "date": "2025-12-22", "hex": "00000000F8FFFFFF3F000000" },
+            { "date": "2025-12-23", "hex": "00000000F8FF770000000000" },
+            { "date": "2025-12-24", "hex": "000000000000000000000000" },
+            { "date": "2025-12-25", "hex": "000000000000000000000000" },
+            { "date": "2025-12-26", "hex": "000000000000000000000000" },
+            { "date": "2025-12-27", "hex": "000000000000000000000000" },
+            { "date": "2025-12-28", "hex": "000000000000000000000000" },
+            { "date": "2025-12-29", "hex": "00000000F8FF3F0000000000" },
+            { "date": "2025-12-30", "hex": "000000000000000000000000" },
+            { "date": "2025-12-31", "hex": "000000000000000000000000" },
+            { "date": "2026-01-01", "hex": "00000000F807000000000000" },
+            { "date": "2026-01-02", "hex": "00000000F03F03FF1FFC0F00" },
+            { "date": "2026-01-03", "hex": "00000000C0FFF01FF07F0000" },
+            { "date": "2026-01-04", "hex": "0000000000FC7F00F02F0000" },
+            { "date": "2026-01-05", "hex": "00000000FCFFFFFFDF1F0000" },
+            { "date": "2026-01-06", "hex": "00000000000000F8FF1F1E00" },
+            { "date": "2026-01-07", "hex": "00000000FEFFFFFFFF000000" },
+            { "date": "2026-01-08", "hex": "000000FFFFFFFFFFFF070000" },
+            { "date": "2026-01-09", "hex": "00000100FFFFFFFFFF070000" },
+            { "date": "2026-01-10", "hex": "00000000F040DF0F00F00700" },
+            { "date": "2026-01-11", "hex": "00000000FCFFFFFFFF07FF01" },
+            { "date": "2026-01-12", "hex": "000000C0FFFFFF0700000000" },
+            { "date": "2026-01-13", "hex": "000000000000000000000000" },
+            { "date": "2026-01-14", "hex": "000000000000000000000000" },
+            { "date": "2026-01-15", "hex": "000000000000000000000000" },
+            { "date": "2026-01-16", "hex": "000000000000000000000000" },
+            { "date": "2026-01-17", "hex": "000000000000000000000000" },
+            { "date": "2026-01-18", "hex": "0000000000001F00807F0000" },
+            { "date": "2026-01-19", "hex": "000000000000E01F0007001E" },
+            { "date": "2026-01-20", "hex": "00000000F8FFFFFF0F000000" },
+            { "date": "2026-01-21", "hex": "00000000FCFFFFFF7F000000" },
+            { "date": "2026-01-22", "hex": "00000000FCFFFFFF7F000000" },
+            { "date": "2026-01-23", "hex": "00000000F8FFFFFFFF0F0000" },
+            { "date": "2026-01-24", "hex": "0000000000F0FF807F000000" },
+            { "date": "2026-01-25", "hex": "00000000F0FFFF0500000000" },
+            { "date": "2026-01-26", "hex": "000000000000000000000000" },
+            { "date": "2026-01-27", "hex": "00000000F8FFFFFF1F000000" },
+            { "date": "2026-01-28", "hex": "0000000000000080FFFB0300" },
+            { "date": "2026-01-29", "hex": "00000000FCFFFFFFFFFF8FFF" },
+            { "date": "2026-01-30", "hex": "01000000F0FFFFFFFF8F0000" },
+            { "date": "2026-01-31", "hex": "0000000000F0FF7FF8FF0000" },
+            { "date": "2026-02-01", "hex": "0000000000FC1FFFCFFF3F00" },
+            { "date": "2026-02-02", "hex": "00000000F0FFFFFFFFFF0C00" },
+            { "date": "2026-02-03", "hex": "000000C0FFFFFFFFFF000000" },
+            { "date": "2026-02-04", "hex": "00000000F8FFFFFFFFFFFF01" },
+            { "date": "2026-02-05", "hex": "00000080F3FFFBE7FF000000" },
+            { "date": "2026-02-06", "hex": "00000000F8FFFFFF0F000000" },
+            { "date": "2026-02-07", "hex": "000000000000000000000000" },
+            { "date": "2026-02-08", "hex": "000000000000000000000000" },
+            { "date": "2026-02-09", "hex": "00000000F0FF000000000000" },
+            { "date": "2026-02-10", "hex": "00000000FF3F000000000000" },
+            { "date": "2026-02-11", "hex": "00000000F8FFFF1F00000000" },
+            { "date": "2026-02-12", "hex": "00000000F83B000000000000" },
+            { "date": "2026-02-13", "hex": "000000000000000000010000" },
+            { "date": "2026-02-14", "hex": "000000000000000000000000" },
+            { "date": "2026-02-15", "hex": "000000000000000000000000" },
+            { "date": "2026-02-16", "hex": "00000000F0FF1D0000000000" },
+            { "date": "2026-02-17", "hex": "00000000F07FFEFF1F000000" },
+            { "date": "2026-02-18", "hex": "00000000B0FFDFFF07000000" },
+            { "date": "2026-02-19", "hex": "00000000E0FFFBFF3F000000" },
+            { "date": "2026-02-20", "hex": "00000000E0FFF70300080000" },
+            { "date": "2026-02-21", "hex": "0000000000007E2000000000" },
+            { "date": "2026-02-22", "hex": "000000000000000000030000" },
+            { "date": "2026-02-23", "hex": "00000000F0FFFFFFFF0F0000" },
+            { "date": "2026-02-24", "hex": "000000000000000000000000" },
+            { "date": "2026-02-25", "hex": "000000000000000000000000" },
+            { "date": "2026-02-26", "hex": "000000000000000000000000" },
+            { "date": "2026-02-27", "hex": "000000000000000000000000" },
+            { "date": "2026-02-28", "hex": "0000000000C0FF0001FFFC07" },
+            { "date": "2026-03-01", "hex": "00000000E0000200E0FFFF00" },
+            { "date": "2026-03-02", "hex": "00000000F80300000000F80F" },
+            { "date": "2026-03-03", "hex": "00000000F0FFFFFF7F0C0300" },
+            { "date": "2026-03-04", "hex": "000081BFFFFFBF3FF0000080" },
+            { "date": "2026-03-05", "hex": "1F0000E0FFFF7FF003000000" },
+            { "date": "2026-03-06", "hex": "000000FEFD0300E081FB00E0" },
+            { "date": "2026-03-07", "hex": "070000C007000000BEF70F00" },
+            { "date": "2026-03-08", "hex": "0000F81F073CFE8F7F783000" },
+            { "date": "2026-03-09", "hex": "0000F0FB01E0037FFFF90703" },
+            { "date": "2026-03-10", "hex": "0000F03FFEFFFBFF0F0E0000" }
+        ]
+
+        const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        function hexToBits(hex) {
+            // Each hex char → 4 bits, total 24 chars → 96 bits
+            // Bits are LSB-first within each byte
+            const bits = [];
+            for (let i = 0; i < hex.length; i += 2) {
+                const byte = parseInt(hex.slice(i, i + 2), 16);
+                for (let b = 0; b < 8; b++) {
+                    bits.push((byte >> b) & 1);
+                }
+            }
+            return bits; // 96 bits, bin 0 = midnight
+        }
+
+        function formatTime(binIndex) {
+            const totalMins = binIndex * 15;
+            const h = Math.floor(totalMins / 60);
+            const m = totalMins % 60;
+            const ampm = h < 12 ? 'AM' : 'PM';
+            const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+            return `${h12}:${m.toString().padStart(2, '0')} ${ampm}`;
+        }
+
+        function formatHour(binIndex) {
+            const h = Math.floor(binIndex * 15 / 60);
+            if (h === 0) return '12a';
+            if (h === 12) return '12p';
+            if (h < 12) return `${h}a`;
+            return `${h - 12}p`;
+        }
+
+        // Group days by week (Mon–Sun)
+        function getWeekKey(dateStr) {
+            const d = new Date(dateStr + 'T12:00:00');
+            const day = d.getDay(); // 0=Sun
+            // Week starts Monday
+            const diff = (day === 0) ? -6 : 1 - day;
+            const mon = new Date(d);
+            mon.setDate(d.getDate() + diff);
+            return mon.toISOString().slice(0, 10);
+        }
+
+        // Build weeks map
+        const weeks = new Map();
+        DATA.forEach(entry => {
+            const wk = getWeekKey(entry.date);
+            if (!weeks.has(wk)) weeks.set(wk, []);
+            weeks.get(wk).push(entry);
+        });
+
+        // Time axis
+        const cal = document.getElementById('calendar');
+
+        // Time axis header
+        const axisRow = document.createElement('div');
+        axisRow.className = 'time-axis-row';
+
+        // 24 hours, each hour = 4 bins at (10+2)px each + 4px group margin
+        // We'll place labels at every 4 hours
+        let axisHTML = '';
+        for (let g = 0; g < 24; g++) {
+            const marginL = g > 0 ? '4px' : '0';
+            // each group = 4 bins * 12px + 3 gaps * 2px = 48+6 = 54px  
+            const groupW = 4 * 10 + 3 * 2; // 46px
+            if (g % 4 === 0) {
+                axisHTML += `<div class="time-label" style="width:${groupW}px;margin-left:${marginL}">${formatHour(g * 4)}</div>`;
+            } else {
+                axisHTML += `<div class="time-spacer" style="display:inline-block;width:${groupW}px;margin-left:${marginL}"></div>`;
+            }
+        }
+        axisRow.innerHTML = axisHTML;
+        cal.appendChild(axisRow);
+
+        let totalActive = 0;
+        let totalBins = 0;
+
+        weeks.forEach((entries, weekKey) => {
+            const wkDate = new Date(weekKey + 'T12:00:00');
+            const wkEnd = new Date(wkDate);
+            wkEnd.setDate(wkDate.getDate() + 6);
+
+            const weekDiv = document.createElement('div');
+            weekDiv.className = 'week-group';
+
+            const wkLabel = `Week of ${MONTH_NAMES[wkDate.getMonth()]} ${wkDate.getDate()}`;
+            weekDiv.innerHTML = `<div class="week-header">${wkLabel}</div>`;
+
+            entries.forEach(entry => {
+                const d = new Date(entry.date + 'T12:00:00');
+                const bits = hexToBits(entry.hex);
+                const activeCount = bits.filter(b => b === 1).length;
+                totalActive += activeCount;
+                totalBins += 96;
+
+                const dayRow = document.createElement('div');
+                dayRow.className = 'day-row';
+
+                const dayLabel = document.createElement('div');
+                dayLabel.className = 'day-label';
+                dayLabel.innerHTML = `
+      <div class="day-name">${DAY_NAMES[d.getDay()]}</div>
+      <div class="day-date">${MONTH_NAMES[d.getMonth()]} <span class="day-num">${d.getDate()}</span></div>
+    `;
+                dayRow.appendChild(dayLabel);
+
+                const binsDiv = document.createElement('div');
+                binsDiv.className = 'bins';
+
+                // Group into 24 hour-groups of 4 bins each
+                for (let h = 0; h < 24; h++) {
+                    const hGroup = document.createElement('div');
+                    hGroup.className = 'hour-group';
+                    for (let q = 0; q < 4; q++) {
+                        const idx = h * 4 + q;
+                        const active = bits[idx];
+                        const bin = document.createElement('div');
+                        bin.className = 'bin';
+                        bin.dataset.active = active;
+                        bin.dataset.tip = `${formatTime(idx)}–${formatTime(idx + 1)} · ${active ? '●' : '○'}`;
+                        hGroup.appendChild(bin);
+                    }
+                    binsDiv.appendChild(hGroup);
+                }
+
+                dayRow.appendChild(binsDiv);
+
+                const countDiv = document.createElement('div');
+                countDiv.className = 'day-count';
+                const hrs = Math.floor(activeCount * 15 / 60);
+                const mins = (activeCount * 15) % 60;
+                countDiv.innerHTML = `<span>${hrs}h${mins ? mins + 'm' : ''}</span>`;
+                dayRow.appendChild(countDiv);
+
+                weekDiv.appendChild(dayRow);
+            });
+
+            cal.appendChild(weekDiv);
+        });
+
+        // Stats
+        const totalHrs = Math.floor(totalActive * 15 / 60);
+        const totalMins = (totalActive * 15) % 60;
+        const pct = Math.round(totalActive / totalBins * 100);
+        document.getElementById('stats').innerHTML = `
+  <div><span class="stat-val">${totalHrs}h ${totalMins}m</span>total active time</div>
+  <div><span class="stat-val">${pct}%</span>of tracked period</div>
+  <div><span class="stat-val">${DATA.length}</span>days recorded</div>
+`;
+    </script>
 </body>
 
 </html>
