@@ -173,6 +173,13 @@
             padding-top: 0;
         }
 
+        .week-total {
+            font-weight: 400;
+            color: var(--text-tertiary);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
         /* Day row */
         .day-row {
             display: flex;
@@ -257,11 +264,11 @@
 
             /* Work-hours boundary markers (weekdays 9–5) */
             .bin[data-work-start] {
-                box-shadow: -2px 0 0 0 var(--text);
+                box-shadow: inset 2px 0 0 0 var(--text);
             }
 
             .bin[data-work-end] {
-                box-shadow: 2px 0 0 0 var(--text);
+                box-shadow: inset -2px 0 0 0 var(--text);
             }
 
             /* Tooltip */
@@ -347,40 +354,6 @@
                 background: var(--green-3);
             }
 
-        /* Stats */
-        .stats-bar {
-            margin-top: 20px;
-            padding: 16px 20px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            display: flex;
-            gap: 32px;
-            flex-wrap: wrap;
-        }
-
-            .stats-bar > div {
-                font-size: 11px;
-                color: var(--text-secondary);
-            }
-
-        .stat-val {
-            font-size: 22px;
-            font-weight: 600;
-            color: var(--text);
-            display: block;
-            line-height: 1.3;
-        }
-
-        /* Footer section hidden until data loads */
-        .calendar-footer {
-            display: none;
-        }
-
-            .calendar-footer.visible {
-                display: block;
-            }
-
         /* Responsive */
         @media (max-width: 640px) {
             .page {
@@ -459,11 +432,11 @@
             }
 
             .bin[data-work-start] {
-                box-shadow: -1px 0 0 0 var(--text);
+                box-shadow: inset 1px 0 0 0 var(--text);
             }
 
             .bin[data-work-end] {
-                box-shadow: 1px 0 0 0 var(--text);
+                box-shadow: inset -1px 0 0 0 var(--text);
             }
         }
     </style>
@@ -485,10 +458,7 @@
             </div>
         </div>
 
-        <div class="calendar-footer" id="footer">
-            <div class="stats-bar" id="stats"></div>
         </div>
-    </div>
 
     <script>
         const DATA_URL = 'https://swharden.com/activity/test/data/';
@@ -578,17 +548,23 @@
             axisRow.innerHTML = axisHTML;
             cal.appendChild(axisRow);
 
-            let totalActive = 0;
-            let totalBins = 0;
-
             weeks.forEach((entries, weekKey) => {
                 const wkDate = new Date(weekKey + 'T12:00:00');
+
+                // Compute weekly total active bins
+                let weekActive = 0;
+                entries.forEach(e => {
+                    weekActive += hexToBits(e.hex).filter(b => b === 1).length;
+                });
+                const weekHrs = Math.floor(weekActive * 15 / 60);
+                const weekMins = (weekActive * 15) % 60;
+                const weekTotalStr = `${weekHrs}h${weekMins ? weekMins + 'm' : ''}`;
 
                 const weekDiv = document.createElement('div');
                 weekDiv.className = 'week-group';
 
                 const wkLabel = `Week of ${MONTH_NAMES[wkDate.getMonth()]} ${wkDate.getDate()}`;
-                weekDiv.innerHTML = `<div class="week-header">${wkLabel}</div>`;
+                weekDiv.innerHTML = `<div class="week-header">${wkLabel} <span class="week-total">· ${weekTotalStr}</span></div>`;
 
                 entries.forEach(entry => {
                     const d = new Date(entry.date + 'T12:00:00');
@@ -596,8 +572,6 @@
                     const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
                     const bits = hexToBits(entry.hex);
                     const activeCount = bits.filter(b => b === 1).length;
-                    totalActive += activeCount;
-                    totalBins += 96;
 
                     const dayRow = document.createElement('div');
                     dayRow.className = 'day-row';
@@ -644,19 +618,6 @@
 
                 cal.appendChild(weekDiv);
             });
-
-            // Stats
-            const totalHrs = Math.floor(totalActive * 15 / 60);
-            const totalMins = (totalActive * 15) % 60;
-            const pct = Math.round(totalActive / totalBins * 100);
-            document.getElementById('stats').innerHTML = `
-                    <div><span class="stat-val">${totalHrs}h ${totalMins}m</span>Total active time</div>
-                    <div><span class="stat-val">${pct}%</span>Of tracked period</div>
-                    <div><span class="stat-val">${data.length}</span>Days recorded</div>
-                `;
-
-            // Show footer
-            document.getElementById('footer').classList.add('visible');
         }
 
         // Fetch and render
