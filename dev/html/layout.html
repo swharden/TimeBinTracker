@@ -131,10 +131,10 @@
             font-size: 9px;
             color: var(--text-tertiary);
             letter-spacing: 0.02em;
-            width: 0;
             white-space: nowrap;
-            overflow: visible;
+            overflow: hidden;
             display: inline-block;
+            text-align: left;
         }
 
         .time-spacer {
@@ -493,6 +493,15 @@
             return `${h - 12}p`;
         }
 
+        function formatHours(binCount) {
+            const totalMins = binCount * 15;
+            const h = Math.floor(totalMins / 60);
+            const m = totalMins % 60;
+            const frac = m / 60;
+            const rounded = Math.round(frac * 100);
+            return rounded ? `${h}.${String(rounded).padStart(2, '0')} hr` : `${h} hr`;
+        }
+
         function getWeekKey(dateStr) {
             const d = new Date(dateStr + 'T12:00:00');
             const day = d.getDay();
@@ -536,10 +545,9 @@
             let axisHTML = '';
             const groupW = 4 * BIN_W;
             for (let g = 0; g < 24; g++) {
-                // Subsequent groups have a 1px border-left, so offset the axis spacer to match
                 const extraW = g > 0 ? BORDER_W : 0;
                 const totalW = groupW + extraW;
-                if (g % 4 === 0) {
+                if (g % 3 === 0) {
                     axisHTML += `<div class="time-label" style="width:${totalW}px">${formatHour(g * 4)}</div>`;
                 } else {
                     axisHTML += `<div class="time-spacer" style="display:inline-block;width:${totalW}px"></div>`;
@@ -556,9 +564,7 @@
                 entries.forEach(e => {
                     weekActive += hexToBits(e.hex).filter(b => b === 1).length;
                 });
-                const weekHrs = Math.floor(weekActive * 15 / 60);
-                const weekMins = (weekActive * 15) % 60;
-                const weekTotalStr = `${weekHrs}h${weekMins ? weekMins + 'm' : ''}`;
+                const weekTotalStr = formatHours(weekActive);
 
                 const weekDiv = document.createElement('div');
                 weekDiv.className = 'week-group';
@@ -608,9 +614,7 @@
 
                     const countDiv = document.createElement('div');
                     countDiv.className = 'day-count';
-                    const hrs = Math.floor(activeCount * 15 / 60);
-                    const mins = (activeCount * 15) % 60;
-                    countDiv.innerHTML = `<span>${hrs}h${mins ? mins + 'm' : ''}</span>`;
+                    countDiv.innerHTML = `<span>${formatHours(activeCount)}</span>`;
                     dayRow.appendChild(countDiv);
 
                     weekDiv.appendChild(dayRow);
