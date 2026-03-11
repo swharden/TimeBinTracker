@@ -51,8 +51,6 @@
         /* Header */
         header {
             margin-bottom: 32px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid var(--border);
         }
 
         .header-eyebrow {
@@ -474,7 +472,6 @@
 <body>
     <div class="page">
         <header>
-            <div class="header-eyebrow">15-min resolution · 96 bins/day</div>
             <h1>Activity <span>Log</span></h1>
             <div class="subtitle" id="subtitle">Loading activity data…</div>
         </header>
@@ -489,16 +486,6 @@
         </div>
 
         <div class="calendar-footer" id="footer">
-            <div class="legend">
-                <span>Less</span>
-                <div class="legend-bins">
-                    <div class="legend-bin off"></div>
-                    <div class="legend-bin on"></div>
-                </div>
-                <span>More</span>
-                <span style="margin-left: 8px; border-left: 1px solid var(--border); padding-left: 12px;">Each square = 15 min</span>
-            </div>
-
             <div class="stats-bar" id="stats"></div>
         </div>
     </div>
@@ -558,7 +545,7 @@
 
             // Update subtitle with actual date range
             document.getElementById('subtitle').textContent =
-                `${formatDateRange(data)} · ${data.length} days · daily activity bins`;
+                `${formatDateRange(data)} · ${data.length} days · 15-minute bins`;
 
             // Read CSS variable values for JS layout calculations
             const rootStyle = getComputedStyle(document.documentElement);
