@@ -20,9 +20,9 @@
             --green-3: #30a14e;
             --green-4: #216e39;
             --accent: #1a7f37;
-            --hour-w: 10px;
-            --hour-h: 26px;
-            --gap: 2px;
+            --hour-w: 6px;
+            --hour-h: 18px;
+            --gap: 1px;
             --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
             --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
         }
@@ -43,9 +43,9 @@
         }
 
         .page {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 32px 24px 64px;
+            padding: 32px 20px 64px;
         }
 
         /* Header */
@@ -80,17 +80,57 @@
             color: var(--text-secondary);
         }
 
+        /* Loading indicator */
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 48px 0;
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
+
+        .loading-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-top-color: var(--text-tertiary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-error {
+            padding: 48px 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+            .loading-error code {
+                font-family: var(--font-mono);
+                font-size: 12px;
+                background: var(--bg-secondary);
+                border: 1px solid var(--border);
+                border-radius: 4px;
+                padding: 2px 6px;
+            }
+
         /* Time axis */
         .time-axis-row {
             display: flex;
             align-items: center;
             margin-bottom: 4px;
-            padding-left: 140px;
+            padding-left: 108px;
         }
 
         .time-label {
             font-family: var(--font-mono);
-            font-size: 10px;
+            font-size: 9px;
             color: var(--text-tertiary);
             letter-spacing: 0.02em;
             width: 0;
@@ -115,18 +155,18 @@
 
         /* Week group */
         .week-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .week-header {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            margin-bottom: 8px;
-            padding-left: 140px;
-            padding-top: 12px;
+            margin-bottom: 6px;
+            padding-left: 108px;
+            padding-top: 10px;
             border-top: 1px solid var(--border-light);
         }
 
@@ -139,33 +179,33 @@
         .day-row {
             display: flex;
             align-items: center;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
 
             .day-row:hover {
                 background: var(--bg-secondary);
-                border-radius: 6px;
+                border-radius: 4px;
             }
 
         .day-label {
-            width: 140px;
+            width: 108px;
             flex-shrink: 0;
             display: flex;
             align-items: baseline;
-            gap: 8px;
-            padding-left: 8px;
+            gap: 6px;
+            padding-left: 6px;
         }
 
         .day-name {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text);
-            width: 30px;
+            width: 28px;
         }
 
         .day-date {
             font-family: var(--font-mono);
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-tertiary);
         }
 
@@ -187,14 +227,14 @@
         }
 
             .hour-group + .hour-group {
-                margin-left: 3px;
+                margin-left: 2px;
             }
 
         /* Individual bin */
         .bin {
             width: var(--hour-w);
             height: var(--hour-h);
-            border-radius: 2px;
+            border-radius: 1px;
             flex-shrink: 0;
             transition: transform 0.1s ease;
             cursor: default;
@@ -202,7 +242,7 @@
         }
 
             .bin:hover {
-                transform: scaleY(1.3);
+                transform: scaleY(1.4);
                 z-index: 10;
             }
 
@@ -212,6 +252,15 @@
 
             .bin[data-active="1"] {
                 background: var(--green-3);
+            }
+
+            /* Work-hours boundary markers (weekdays 9–5) */
+            .bin[data-work-start] {
+                box-shadow: -2px 0 0 0 var(--text);
+            }
+
+            .bin[data-work-end] {
+                box-shadow: 2px 0 0 0 var(--text);
             }
 
             /* Tooltip */
@@ -224,10 +273,10 @@
                 background: var(--text);
                 color: var(--bg);
                 font-family: var(--font-mono);
-                font-size: 11px;
+                font-size: 10px;
                 white-space: nowrap;
-                padding: 4px 8px;
-                border-radius: 6px;
+                padding: 3px 7px;
+                border-radius: 5px;
                 pointer-events: none;
                 opacity: 0;
                 transition: opacity 0.12s;
@@ -255,11 +304,11 @@
 
         /* Activity count */
         .day-count {
-            margin-left: 12px;
+            margin-left: 8px;
             font-family: var(--font-mono);
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-tertiary);
-            min-width: 48px;
+            min-width: 44px;
         }
 
             .day-count span {
@@ -269,11 +318,11 @@
 
         /* Legend */
         .legend {
-            margin-top: 32px;
+            margin-top: 28px;
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-tertiary);
         }
 
@@ -284,9 +333,9 @@
         }
 
         .legend-bin {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
+            width: 8px;
+            height: 8px;
+            border-radius: 1px;
         }
 
             .legend-bin.off {
@@ -299,73 +348,46 @@
 
         /* Stats */
         .stats-bar {
-            margin-top: 24px;
-            padding: 20px 24px;
+            margin-top: 20px;
+            padding: 16px 20px;
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 8px;
             display: flex;
-            gap: 40px;
+            gap: 32px;
             flex-wrap: wrap;
         }
 
             .stats-bar > div {
-                font-size: 12px;
+                font-size: 11px;
                 color: var(--text-secondary);
             }
 
         .stat-val {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
             color: var(--text);
             display: block;
             line-height: 1.3;
         }
 
+        /* Footer section hidden until data loads */
+        .calendar-footer {
+            display: none;
+        }
+
+            .calendar-footer.visible {
+                display: block;
+            }
+
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 640px) {
             .page {
-                padding: 20px 16px 48px;
+                padding: 20px 12px 48px;
             }
 
             h1 {
                 font-size: 22px;
-            }
-
-            .time-axis-row {
-                padding-left: 100px;
-            }
-
-            .day-label {
-                width: 100px;
-            }
-
-            .day-date {
-                display: none;
-            }
-
-            .stats-bar {
-                gap: 24px;
-                padding: 16px;
-            }
-
-            .stat-val {
-                font-size: 20px;
-            }
-
-            .week-header {
-                padding-left: 100px;
-                font-size: 11px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .page {
-                padding: 16px 12px 40px;
-            }
-
-            h1 {
-                font-size: 20px;
             }
 
             .time-axis-row {
@@ -377,8 +399,8 @@
                 padding-left: 4px;
             }
 
-            .day-name {
-                font-size: 11px;
+            .day-date {
+                display: none;
             }
 
             .day-count {
@@ -392,6 +414,47 @@
 
             .stats-bar {
                 gap: 20px;
+                padding: 14px 16px;
+            }
+
+            .stat-val {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            :root {
+                --hour-w: 4px;
+                --hour-h: 14px;
+            }
+
+            .page {
+                padding: 16px 8px 40px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .time-axis-row {
+                padding-left: 52px;
+            }
+
+            .day-label {
+                width: 52px;
+            }
+
+            .day-name {
+                font-size: 10px;
+                width: 24px;
+            }
+
+            .week-header {
+                padding-left: 52px;
+            }
+
+            .hour-group + .hour-group {
+                margin-left: 1px;
             }
         }
     </style>
@@ -402,226 +465,35 @@
         <header>
             <div class="header-eyebrow">15-min resolution · 96 bins/day</div>
             <h1>Activity <span>Log</span></h1>
-            <div class="subtitle">Mar 02 – Mar 10, 2026 · daily activity bins</div>
+            <div class="subtitle" id="subtitle">Loading activity data…</div>
         </header>
 
         <div class="calendar-scroll">
-            <div class="calendar-inner" id="calendar"></div>
-        </div>
-
-        <div class="legend">
-            <span>Less</span>
-            <div class="legend-bins">
-                <div class="legend-bin off"></div>
-                <div class="legend-bin on"></div>
+            <div class="calendar-inner" id="calendar">
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    Fetching activity data…
+                </div>
             </div>
-            <span>More</span>
-            <span style="margin-left: 8px; border-left: 1px solid var(--border); padding-left: 12px;">Each square = 15 min</span>
         </div>
 
-        <div class="stats-bar" id="stats"></div>
+        <div class="calendar-footer" id="footer">
+            <div class="legend">
+                <span>Less</span>
+                <div class="legend-bins">
+                    <div class="legend-bin off"></div>
+                    <div class="legend-bin on"></div>
+                </div>
+                <span>More</span>
+                <span style="margin-left: 8px; border-left: 1px solid var(--border); padding-left: 12px;">Each square = 15 min</span>
+            </div>
+
+            <div class="stats-bar" id="stats"></div>
+        </div>
     </div>
 
     <script>
-        const DATA = [
-            { "date": "2025-08-27", "hex": "00000000FCFFFDFFFFFF0100" },
-            { "date": "2025-08-28", "hex": "00000000F0FFFBFF7F000000" },
-            { "date": "2025-08-29", "hex": "00000000FCFFFFFF01000000" },
-            { "date": "2025-08-30", "hex": "000000000000000000000000" },
-            { "date": "2025-08-31", "hex": "000000000000000000000000" },
-            { "date": "2025-09-01", "hex": "000000000000000000000000" },
-            { "date": "2025-09-02", "hex": "00000000F87FFBFFFF000000" },
-            { "date": "2025-09-03", "hex": "00000000F87FF1FFFF000000" },
-            { "date": "2025-09-04", "hex": "00000000F8FFFEFF3F000000" },
-            { "date": "2025-09-05", "hex": "00000000F0FFFFFF3F000000" },
-            { "date": "2025-09-06", "hex": "000000000000020000000000" },
-            { "date": "2025-09-07", "hex": "000000000000000000080000" },
-            { "date": "2025-09-08", "hex": "00000000F8FFE1FFFF030000" },
-            { "date": "2025-09-09", "hex": "00000000F8FFFFFFFFF80000" },
-            { "date": "2025-09-10", "hex": "00000000FCFFFFFFFFCF0000" },
-            { "date": "2025-09-11", "hex": "00000030FEFFFFFFFFBF2300" },
-            { "date": "2025-09-12", "hex": "2000E07FFFFFFFFF3F000000" },
-            { "date": "2025-09-13", "hex": "000000000000000000000000" },
-            { "date": "2025-09-14", "hex": "0000000000F0FF0300000000" },
-            { "date": "2025-09-15", "hex": "00000000FEFFFFFFFF000000" },
-            { "date": "2025-09-16", "hex": "00000000F0FFFBFF7F0F0000" },
-            { "date": "2025-09-17", "hex": "00000000FCFFFFFF7F000000" },
-            { "date": "2025-09-18", "hex": "00000000F8FFFFFFFF3F0000" },
-            { "date": "2025-09-19", "hex": "0000003FF0FFFFFFFF1F0000" },
-            { "date": "2025-09-20", "hex": "0000000000F0FF0F3EFFFF00" },
-            { "date": "2025-09-21", "hex": "000000F00FFF3FFEF03F0000" },
-            { "date": "2025-09-22", "hex": "00000000FFFFFFFFFF070000" },
-            { "date": "2025-09-23", "hex": "000000F0FFFFFFFFFF010000" },
-            { "date": "2025-09-24", "hex": "00000000FFFFFF7F00000000" },
-            { "date": "2025-09-25", "hex": "00000000FEFFFFFFFF000000" },
-            { "date": "2025-09-26", "hex": "000000FCFFFFFFFFFF000000" },
-            { "date": "2025-09-27", "hex": "00000000FEFFFF4300000000" },
-            { "date": "2025-09-28", "hex": "0000000007F01FFE03000000" },
-            { "date": "2025-09-29", "hex": "00000000FEFFFFFFFF010000" },
-            { "date": "2025-09-30", "hex": "000000E0FFFFFFFFFF030000" },
-            { "date": "2025-10-01", "hex": "00000000F8FFFFFFFF3F0000" },
-            { "date": "2025-10-02", "hex": "00000000F8FFFFFFFF000000" },
-            { "date": "2025-10-03", "hex": "00000000FFFFFFFFFF3F0000" },
-            { "date": "2025-10-04", "hex": "00000000FC1FC03FFC0F0000" },
-            { "date": "2025-10-05", "hex": "00000000E0FFFF0F80DF0000" },
-            { "date": "2025-10-06", "hex": "00000000F8FFFFFFFFF0FF3F" },
-            { "date": "2025-10-07", "hex": "000000FCFFFFFFFFFF010000" },
-            { "date": "2025-10-08", "hex": "000000E0FFFFFFFFFFFF0100" },
-            { "date": "2025-10-09", "hex": "00000000FCFFFFFFFF1F0000" },
-            { "date": "2025-10-10", "hex": "000000000000000000000000" },
-            { "date": "2025-10-11", "hex": "000000000000000000000000" },
-            { "date": "2025-10-12", "hex": "000000000000000000000000" },
-            { "date": "2025-10-13", "hex": "000000BFFDFFFFFFFF010000" },
-            { "date": "2025-10-14", "hex": "00000000FEFFFFFFFFFF0000" },
-            { "date": "2025-10-15", "hex": "00000000FEFFFF87FFFF6700" },
-            { "date": "2025-10-16", "hex": "00000000FFFFFFFF0F000000" },
-            { "date": "2025-10-17", "hex": "000000000000000000000000" },
-            { "date": "2025-10-18", "hex": "000000000000000000000000" },
-            { "date": "2025-10-19", "hex": "000000000000000000000000" },
-            { "date": "2025-10-20", "hex": "00000000FCFFFFFFFF1F0000" },
-            { "date": "2025-10-21", "hex": "000000E0FFFFFFFFFFFF7800" },
-            { "date": "2025-10-22", "hex": "00000000FEFFFFFFFF030000" },
-            { "date": "2025-10-23", "hex": "00000000FEFFFBFFFF2F0000" },
-            { "date": "2025-10-24", "hex": "000000F0FFFFFFFF0F00E003" },
-            { "date": "2025-10-25", "hex": "0000000000FF3F307F000000" },
-            { "date": "2025-10-26", "hex": "0000000000E0FFFFFF010000" },
-            { "date": "2025-10-27", "hex": "00000000FCFFFFFF7FE00000" },
-            { "date": "2025-10-28", "hex": "00000000F8FFFFFFFF000000" },
-            { "date": "2025-10-29", "hex": "00000000F8FFFFFFFF0F0000" },
-            { "date": "2025-10-30", "hex": "000080FFBFFFF9FF00000000" },
-            { "date": "2025-10-31", "hex": "00000000F8FFFBFFFF001800" },
-            { "date": "2025-11-01", "hex": "00000000000F000000000000" },
-            { "date": "2025-11-02", "hex": "000000000000000000000000" },
-            { "date": "2025-11-03", "hex": "00000038FEFFFBFF3F000000" },
-            { "date": "2025-11-04", "hex": "00000000F8FFFCFF3F000000" },
-            { "date": "2025-11-05", "hex": "00000000F0FFEFFF1F000000" },
-            { "date": "2025-11-06", "hex": "00000000F0FFFBFF3F000000" },
-            { "date": "2025-11-07", "hex": "00000000FCFFFFFF0F000000" },
-            { "date": "2025-11-08", "hex": "000000000000000000000000" },
-            { "date": "2025-11-09", "hex": "000000000000000000000000" },
-            { "date": "2025-11-10", "hex": "000000000000000000000000" },
-            { "date": "2025-11-11", "hex": "00000000FCFFFFFF3F000000" },
-            { "date": "2025-11-12", "hex": "00000000F8FFFFFF1F000000" },
-            { "date": "2025-11-13", "hex": "00000000FEFFFFFFFF000000" },
-            { "date": "2025-11-14", "hex": "00000000F8FFEFFF3F000000" },
-            { "date": "2025-11-15", "hex": "000000000000000000000000" },
-            { "date": "2025-11-16", "hex": "000000000000000000000000" },
-            { "date": "2025-11-17", "hex": "00000000F0FFFFFF7FF20100" },
-            { "date": "2025-11-18", "hex": "000000000000000000070000" },
-            { "date": "2025-11-19", "hex": "000080FFFFFFFFFFFF4B0000" },
-            { "date": "2025-11-20", "hex": "000000000000000000000000" },
-            { "date": "2025-11-21", "hex": "000000000000000000000000" },
-            { "date": "2025-11-22", "hex": "000000000000000000000000" },
-            { "date": "2025-11-23", "hex": "000000000000000000000000" },
-            { "date": "2025-11-24", "hex": "000000E0FFFFFFFF3F000000" },
-            { "date": "2025-11-25", "hex": "00000000FCFFFFFF3F000000" },
-            { "date": "2025-11-26", "hex": "00000000F8FFFDFF3F000000" },
-            { "date": "2025-11-27", "hex": "000000000000000000000000" },
-            { "date": "2025-11-28", "hex": "000000000000000000000000" },
-            { "date": "2025-11-29", "hex": "000000000000000000000000" },
-            { "date": "2025-11-30", "hex": "00000000000000000000FF07" },
-            { "date": "2025-12-01", "hex": "00000000E0FFFFFF3F000000" },
-            { "date": "2025-12-02", "hex": "00000080FFFFFFFFFF7F0000" },
-            { "date": "2025-12-03", "hex": "00000000F8FFFFFF1F000000" },
-            { "date": "2025-12-04", "hex": "000000E0FFFFFFFFFF870000" },
-            { "date": "2025-12-05", "hex": "000000000000000000000000" },
-            { "date": "2025-12-06", "hex": "000000000000000000000000" },
-            { "date": "2025-12-07", "hex": "000000000000000000000000" },
-            { "date": "2025-12-08", "hex": "00000000FCFFFFFFFF336E00" },
-            { "date": "2025-12-09", "hex": "00000000FCFFFF3FE01F0004" },
-            { "date": "2025-12-10", "hex": "00001080FFBFFFFFFFFF0100" },
-            { "date": "2025-12-11", "hex": "000000000000000000000000" },
-            { "date": "2025-12-12", "hex": "00000000F0FFFFFFFF000000" },
-            { "date": "2025-12-13", "hex": "000000000000C0FF0F000000" },
-            { "date": "2025-12-14", "hex": "000000000000000000000000" },
-            { "date": "2025-12-15", "hex": "00000000B8FFFFFFFF1F0000" },
-            { "date": "2025-12-16", "hex": "00000000F8FF010000000000" },
-            { "date": "2025-12-17", "hex": "000000000000000000000000" },
-            { "date": "2025-12-18", "hex": "000000000000000000000000" },
-            { "date": "2025-12-19", "hex": "000000000000000000000000" },
-            { "date": "2025-12-20", "hex": "000000000000000000000000" },
-            { "date": "2025-12-21", "hex": "000000000000000000000000" },
-            { "date": "2025-12-22", "hex": "00000000F8FFFFFF3F000000" },
-            { "date": "2025-12-23", "hex": "00000000F8FF770000000000" },
-            { "date": "2025-12-24", "hex": "000000000000000000000000" },
-            { "date": "2025-12-25", "hex": "000000000000000000000000" },
-            { "date": "2025-12-26", "hex": "000000000000000000000000" },
-            { "date": "2025-12-27", "hex": "000000000000000000000000" },
-            { "date": "2025-12-28", "hex": "000000000000000000000000" },
-            { "date": "2025-12-29", "hex": "00000000F8FF3F0000000000" },
-            { "date": "2025-12-30", "hex": "000000000000000000000000" },
-            { "date": "2025-12-31", "hex": "000000000000000000000000" },
-            { "date": "2026-01-01", "hex": "00000000F807000000000000" },
-            { "date": "2026-01-02", "hex": "00000000F03F03FF1FFC0F00" },
-            { "date": "2026-01-03", "hex": "00000000C0FFF01FF07F0000" },
-            { "date": "2026-01-04", "hex": "0000000000FC7F00F02F0000" },
-            { "date": "2026-01-05", "hex": "00000000FCFFFFFFDF1F0000" },
-            { "date": "2026-01-06", "hex": "00000000000000F8FF1F1E00" },
-            { "date": "2026-01-07", "hex": "00000000FEFFFFFFFF000000" },
-            { "date": "2026-01-08", "hex": "000000FFFFFFFFFFFF070000" },
-            { "date": "2026-01-09", "hex": "00000100FFFFFFFFFF070000" },
-            { "date": "2026-01-10", "hex": "00000000F040DF0F00F00700" },
-            { "date": "2026-01-11", "hex": "00000000FCFFFFFFFF07FF01" },
-            { "date": "2026-01-12", "hex": "000000C0FFFFFF0700000000" },
-            { "date": "2026-01-13", "hex": "000000000000000000000000" },
-            { "date": "2026-01-14", "hex": "000000000000000000000000" },
-            { "date": "2026-01-15", "hex": "000000000000000000000000" },
-            { "date": "2026-01-16", "hex": "000000000000000000000000" },
-            { "date": "2026-01-17", "hex": "000000000000000000000000" },
-            { "date": "2026-01-18", "hex": "0000000000001F00807F0000" },
-            { "date": "2026-01-19", "hex": "000000000000E01F0007001E" },
-            { "date": "2026-01-20", "hex": "00000000F8FFFFFF0F000000" },
-            { "date": "2026-01-21", "hex": "00000000FCFFFFFF7F000000" },
-            { "date": "2026-01-22", "hex": "00000000FCFFFFFF7F000000" },
-            { "date": "2026-01-23", "hex": "00000000F8FFFFFFFF0F0000" },
-            { "date": "2026-01-24", "hex": "0000000000F0FF807F000000" },
-            { "date": "2026-01-25", "hex": "00000000F0FFFF0500000000" },
-            { "date": "2026-01-26", "hex": "000000000000000000000000" },
-            { "date": "2026-01-27", "hex": "00000000F8FFFFFF1F000000" },
-            { "date": "2026-01-28", "hex": "0000000000000080FFFB0300" },
-            { "date": "2026-01-29", "hex": "00000000FCFFFFFFFFFF8FFF" },
-            { "date": "2026-01-30", "hex": "01000000F0FFFFFFFF8F0000" },
-            { "date": "2026-01-31", "hex": "0000000000F0FF7FF8FF0000" },
-            { "date": "2026-02-01", "hex": "0000000000FC1FFFCFFF3F00" },
-            { "date": "2026-02-02", "hex": "00000000F0FFFFFFFFFF0C00" },
-            { "date": "2026-02-03", "hex": "000000C0FFFFFFFFFF000000" },
-            { "date": "2026-02-04", "hex": "00000000F8FFFFFFFFFFFF01" },
-            { "date": "2026-02-05", "hex": "00000080F3FFFBE7FF000000" },
-            { "date": "2026-02-06", "hex": "00000000F8FFFFFF0F000000" },
-            { "date": "2026-02-07", "hex": "000000000000000000000000" },
-            { "date": "2026-02-08", "hex": "000000000000000000000000" },
-            { "date": "2026-02-09", "hex": "00000000F0FF000000000000" },
-            { "date": "2026-02-10", "hex": "00000000FF3F000000000000" },
-            { "date": "2026-02-11", "hex": "00000000F8FFFF1F00000000" },
-            { "date": "2026-02-12", "hex": "00000000F83B000000000000" },
-            { "date": "2026-02-13", "hex": "000000000000000000010000" },
-            { "date": "2026-02-14", "hex": "000000000000000000000000" },
-            { "date": "2026-02-15", "hex": "000000000000000000000000" },
-            { "date": "2026-02-16", "hex": "00000000F0FF1D0000000000" },
-            { "date": "2026-02-17", "hex": "00000000F07FFEFF1F000000" },
-            { "date": "2026-02-18", "hex": "00000000B0FFDFFF07000000" },
-            { "date": "2026-02-19", "hex": "00000000E0FFFBFF3F000000" },
-            { "date": "2026-02-20", "hex": "00000000E0FFF70300080000" },
-            { "date": "2026-02-21", "hex": "0000000000007E2000000000" },
-            { "date": "2026-02-22", "hex": "000000000000000000030000" },
-            { "date": "2026-02-23", "hex": "00000000F0FFFFFFFF0F0000" },
-            { "date": "2026-02-24", "hex": "000000000000000000000000" },
-            { "date": "2026-02-25", "hex": "000000000000000000000000" },
-            { "date": "2026-02-26", "hex": "000000000000000000000000" },
-            { "date": "2026-02-27", "hex": "000000000000000000000000" },
-            { "date": "2026-02-28", "hex": "0000000000C0FF0001FFFC07" },
-            { "date": "2026-03-01", "hex": "00000000E0000200E0FFFF00" },
-            { "date": "2026-03-02", "hex": "00000000F80300000000F80F" },
-            { "date": "2026-03-03", "hex": "00000000F0FFFFFF7F0C0300" },
-            { "date": "2026-03-04", "hex": "000081BFFFFFBF3FF0000080" },
-            { "date": "2026-03-05", "hex": "1F0000E0FFFF7FF003000000" },
-            { "date": "2026-03-06", "hex": "000000FEFD0300E081FB00E0" },
-            { "date": "2026-03-07", "hex": "070000C007000000BEF70F00" },
-            { "date": "2026-03-08", "hex": "0000F81F073CFE8F7F783000" },
-            { "date": "2026-03-09", "hex": "0000F0FB01E0037FFFF90703" },
-            { "date": "2026-03-10", "hex": "0000F03FFEFFFBFF0F0E0000" }
-        ];
-
+        const DATA_URL = 'https://swharden.com/activity/test/data/';
         const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -662,103 +534,143 @@
             return mon.toISOString().slice(0, 10);
         }
 
-        const weeks = new Map();
-        DATA.forEach(entry => {
-            const wk = getWeekKey(entry.date);
-            if (!weeks.has(wk)) weeks.set(wk, []);
-            weeks.get(wk).push(entry);
-        });
-
-        const cal = document.getElementById('calendar');
-
-        // Time axis header
-        const axisRow = document.createElement('div');
-        axisRow.className = 'time-axis-row';
-        let axisHTML = '';
-        for (let g = 0; g < 24; g++) {
-            const marginL = g > 0 ? '3px' : '0';
-            const groupW = 4 * 10 + 3 * 2;
-            if (g % 4 === 0) {
-                axisHTML += `<div class="time-label" style="width:${groupW}px;margin-left:${marginL}">${formatHour(g * 4)}</div>`;
-            } else {
-                axisHTML += `<div class="time-spacer" style="display:inline-block;width:${groupW}px;margin-left:${marginL}"></div>`;
-            }
+        function formatDateRange(data) {
+            const first = new Date(data[0].date + 'T12:00:00');
+            const last = new Date(data[data.length - 1].date + 'T12:00:00');
+            const fmt = d => `${MONTH_NAMES[d.getMonth()]} ${String(d.getDate()).padStart(2, '0')}, ${d.getFullYear()}`;
+            return `${fmt(first)} – ${fmt(last)}`;
         }
-        axisRow.innerHTML = axisHTML;
-        cal.appendChild(axisRow);
 
-        let totalActive = 0;
-        let totalBins = 0;
+        function render(data) {
+            const cal = document.getElementById('calendar');
+            cal.innerHTML = '';
 
-        weeks.forEach((entries, weekKey) => {
-            const wkDate = new Date(weekKey + 'T12:00:00');
+            // Update subtitle with actual date range
+            document.getElementById('subtitle').textContent =
+                `${formatDateRange(data)} · ${data.length} days · daily activity bins`;
 
-            const weekDiv = document.createElement('div');
-            weekDiv.className = 'week-group';
+            // Read CSS variable values for JS layout calculations
+            const rootStyle = getComputedStyle(document.documentElement);
+            const BIN_W = parseInt(rootStyle.getPropertyValue('--hour-w'));
+            const BIN_GAP = parseInt(rootStyle.getPropertyValue('--gap'));
+            const GROUP_MARGIN = 2;
 
-            const wkLabel = `Week of ${MONTH_NAMES[wkDate.getMonth()]} ${wkDate.getDate()}`;
-            weekDiv.innerHTML = `<div class="week-header">${wkLabel}</div>`;
-
-            entries.forEach(entry => {
-                const d = new Date(entry.date + 'T12:00:00');
-                const bits = hexToBits(entry.hex);
-                const activeCount = bits.filter(b => b === 1).length;
-                totalActive += activeCount;
-                totalBins += 96;
-
-                const dayRow = document.createElement('div');
-                dayRow.className = 'day-row';
-
-                const dayLabel = document.createElement('div');
-                dayLabel.className = 'day-label';
-                dayLabel.innerHTML = `
-                        <div class="day-name">${DAY_NAMES[d.getDay()]}</div>
-                        <div class="day-date">${MONTH_NAMES[d.getMonth()]} <span class="day-num">${d.getDate()}</span></div>
-                    `;
-                dayRow.appendChild(dayLabel);
-
-                const binsDiv = document.createElement('div');
-                binsDiv.className = 'bins';
-
-                for (let h = 0; h < 24; h++) {
-                    const hGroup = document.createElement('div');
-                    hGroup.className = 'hour-group';
-                    for (let q = 0; q < 4; q++) {
-                        const idx = h * 4 + q;
-                        const active = bits[idx];
-                        const bin = document.createElement('div');
-                        bin.className = 'bin';
-                        bin.dataset.active = active;
-                        bin.dataset.tip = `${formatTime(idx)}–${formatTime(idx + 1)} · ${active ? 'Active' : 'Inactive'}`;
-                        hGroup.appendChild(bin);
-                    }
-                    binsDiv.appendChild(hGroup);
-                }
-
-                dayRow.appendChild(binsDiv);
-
-                const countDiv = document.createElement('div');
-                countDiv.className = 'day-count';
-                const hrs = Math.floor(activeCount * 15 / 60);
-                const mins = (activeCount * 15) % 60;
-                countDiv.innerHTML = `<span>${hrs}h${mins ? mins + 'm' : ''}</span>`;
-                dayRow.appendChild(countDiv);
-
-                weekDiv.appendChild(dayRow);
+            // Group days by week
+            const weeks = new Map();
+            data.forEach(entry => {
+                const wk = getWeekKey(entry.date);
+                if (!weeks.has(wk)) weeks.set(wk, []);
+                weeks.get(wk).push(entry);
             });
 
-            cal.appendChild(weekDiv);
-        });
+            // Time axis header
+            const axisRow = document.createElement('div');
+            axisRow.className = 'time-axis-row';
+            let axisHTML = '';
+            const groupW = 4 * BIN_W + 3 * BIN_GAP;
+            for (let g = 0; g < 24; g++) {
+                const marginL = g > 0 ? `${GROUP_MARGIN}px` : '0';
+                if (g % 4 === 0) {
+                    axisHTML += `<div class="time-label" style="width:${groupW}px;margin-left:${marginL}">${formatHour(g * 4)}</div>`;
+                } else {
+                    axisHTML += `<div class="time-spacer" style="display:inline-block;width:${groupW}px;margin-left:${marginL}"></div>`;
+                }
+            }
+            axisRow.innerHTML = axisHTML;
+            cal.appendChild(axisRow);
 
-        // Stats
-        const totalHrs = Math.floor(totalActive * 15 / 60);
-        const totalMins = (totalActive * 15) % 60;
-        const pct = Math.round(totalActive / totalBins * 100);
-        document.getElementById('stats').innerHTML = `
-                <div><span class="stat-val">${totalHrs}h ${totalMins}m</span>Total active time</div>
-                <div><span class="stat-val">${pct}%</span>Of tracked period</div>
-                <div><span class="stat-val">${DATA.length}</span>Days recorded</div>
-            `;
+            let totalActive = 0;
+            let totalBins = 0;
+
+            weeks.forEach((entries, weekKey) => {
+                const wkDate = new Date(weekKey + 'T12:00:00');
+
+                const weekDiv = document.createElement('div');
+                weekDiv.className = 'week-group';
+
+                const wkLabel = `Week of ${MONTH_NAMES[wkDate.getMonth()]} ${wkDate.getDate()}`;
+                weekDiv.innerHTML = `<div class="week-header">${wkLabel}</div>`;
+
+                entries.forEach(entry => {
+                    const d = new Date(entry.date + 'T12:00:00');
+                    const dayOfWeek = d.getDay();
+                    const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+                    const bits = hexToBits(entry.hex);
+                    const activeCount = bits.filter(b => b === 1).length;
+                    totalActive += activeCount;
+                    totalBins += 96;
+
+                    const dayRow = document.createElement('div');
+                    dayRow.className = 'day-row';
+
+                    const dayLabel = document.createElement('div');
+                    dayLabel.className = 'day-label';
+                    dayLabel.innerHTML = `
+                            <div class="day-name">${DAY_NAMES[d.getDay()]}</div>
+                            <div class="day-date">${MONTH_NAMES[d.getMonth()]} <span class="day-num">${d.getDate()}</span></div>
+                        `;
+                    dayRow.appendChild(dayLabel);
+
+                    const binsDiv = document.createElement('div');
+                    binsDiv.className = 'bins';
+
+                    for (let h = 0; h < 24; h++) {
+                        const hGroup = document.createElement('div');
+                        hGroup.className = 'hour-group';
+                        for (let q = 0; q < 4; q++) {
+                            const idx = h * 4 + q;
+                            const active = bits[idx];
+                            const bin = document.createElement('div');
+                            bin.className = 'bin';
+                            bin.dataset.active = active;
+                            if (isWeekday && h === 9 && q === 0) bin.dataset.workStart = '';
+                            if (isWeekday && h === 16 && q === 3) bin.dataset.workEnd = '';
+                            bin.dataset.tip = `${formatTime(idx)}–${formatTime(idx + 1)} · ${active ? 'Active' : 'Inactive'}`;
+                            hGroup.appendChild(bin);
+                        }
+                        binsDiv.appendChild(hGroup);
+                    }
+
+                    dayRow.appendChild(binsDiv);
+
+                    const countDiv = document.createElement('div');
+                    countDiv.className = 'day-count';
+                    const hrs = Math.floor(activeCount * 15 / 60);
+                    const mins = (activeCount * 15) % 60;
+                    countDiv.innerHTML = `<span>${hrs}h${mins ? mins + 'm' : ''}</span>`;
+                    dayRow.appendChild(countDiv);
+
+                    weekDiv.appendChild(dayRow);
+                });
+
+                cal.appendChild(weekDiv);
+            });
+
+            // Stats
+            const totalHrs = Math.floor(totalActive * 15 / 60);
+            const totalMins = (totalActive * 15) % 60;
+            const pct = Math.round(totalActive / totalBins * 100);
+            document.getElementById('stats').innerHTML = `
+                    <div><span class="stat-val">${totalHrs}h ${totalMins}m</span>Total active time</div>
+                    <div><span class="stat-val">${pct}%</span>Of tracked period</div>
+                    <div><span class="stat-val">${data.length}</span>Days recorded</div>
+                `;
+
+            // Show footer
+            document.getElementById('footer').classList.add('visible');
+        }
+
+        // Fetch and render
+        fetch(DATA_URL)
+            .then(res => {
+                if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+                return res.json();
+            })
+            .then(data => render(data))
+            .catch(err => {
+                document.getElementById('calendar').innerHTML =
+                    `<div class="loading-error">Unable to load activity data. <code>${err.message}</code></div>`;
+            });
     </script>
 </body>
 
