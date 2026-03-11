@@ -227,7 +227,8 @@
         }
 
             .hour-group + .hour-group {
-                margin-left: 2px;
+                margin-left: 0;
+                border-left: 1px solid rgba(0, 0, 0, 0.12);
             }
 
         /* Individual bin */
@@ -239,6 +240,8 @@
             transition: transform 0.1s ease;
             cursor: default;
             position: relative;
+            outline: 1px solid rgba(0, 0, 0, 0.06);
+            outline-offset: -1px;
         }
 
             .bin:hover {
@@ -454,7 +457,7 @@
             }
 
             .hour-group + .hour-group {
-                margin-left: 1px;
+                margin-left: 0;
             }
 
             .bin[data-work-start] {
@@ -560,7 +563,7 @@
             // Read CSS variable values for JS layout calculations
             const rootStyle = getComputedStyle(document.documentElement);
             const BIN_W = parseInt(rootStyle.getPropertyValue('--hour-w'));
-            const GROUP_MARGIN = 2;
+            const BORDER_W = 1;
 
             // Group days by week
             const weeks = new Map();
@@ -576,11 +579,13 @@
             let axisHTML = '';
             const groupW = 4 * BIN_W;
             for (let g = 0; g < 24; g++) {
-                const marginL = g > 0 ? `${GROUP_MARGIN}px` : '0';
+                // Subsequent groups have a 1px border-left, so offset the axis spacer to match
+                const extraW = g > 0 ? BORDER_W : 0;
+                const totalW = groupW + extraW;
                 if (g % 4 === 0) {
-                    axisHTML += `<div class="time-label" style="width:${groupW}px;margin-left:${marginL}">${formatHour(g * 4)}</div>`;
+                    axisHTML += `<div class="time-label" style="width:${totalW}px">${formatHour(g * 4)}</div>`;
                 } else {
-                    axisHTML += `<div class="time-spacer" style="display:inline-block;width:${groupW}px;margin-left:${marginL}"></div>`;
+                    axisHTML += `<div class="time-spacer" style="display:inline-block;width:${totalW}px"></div>`;
                 }
             }
             axisRow.innerHTML = axisHTML;
