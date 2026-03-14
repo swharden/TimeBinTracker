@@ -1,5 +1,5 @@
-GET https://swharden.com/activity/add/
+GET https://swharden.com/activity/add/?nocache=djfaskdlfjlasdkjf
 Content-Type: application/x-www-form-urlencoded
 Authorization: Bearer secret123
 
-ComputerId=personal-laptop&Day=2026-03-05&Hex=0F441880044A0D020E80C8442B4004100559
+ComputerId=personal-desktop&Day=2026-03-14&Hex=0F441880044A0D020E80C8442B4004100559

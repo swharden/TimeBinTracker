@@ -7,9 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeBinTracker", "TimeBinTr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeBinTracker.App", "TimeBinTracker.App\TimeBinTracker.App.csproj", "{26DC532B-65BF-D131-1285-9EB730D17175}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dev", "Dev", "{1FA32DCD-CD9D-4FF2-BAA6-160D4C25D39C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A725A3D9-B666-4856-85D3-F2373A45847A}"
 	ProjectSection(SolutionItems) = preProject
-		..\dev\html\layout.html = ..\dev\html\layout.html
+		API\add.http = API\add.http
 	EndProjectSection
 EndProject
 Global
