@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Runtime.InteropServices.JavaScript;
 
 namespace TimeBinTracker;
 
@@ -8,6 +10,7 @@ public class Uploader
     private readonly string SettingURL;
     private readonly string SettingComputer;
     private readonly string SettingSecret;
+    private readonly HttpClient HttpClient = new();
 
     public Uploader(string appFolder)
     {
@@ -23,7 +26,7 @@ public class Uploader
         }
 
         string text = File.ReadAllText(settingsFile);
-        if (text.Contains(">"))
+        if (text.Contains('>'))
             throw new InvalidOperationException("settings file requires customization");
 
         string[] lines = File.ReadAllLines(settingsFile);
@@ -37,20 +40,23 @@ public class Uploader
 
     public async Task<HttpStatusCode> Upload(DayActivity day)
     {
-        using var client = new HttpClient();
-        client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", SettingSecret);
-
         string url = SettingURL +
-            $"?ComputerId={SettingComputer}" +
-            $"&Day={day.GetDayCode()}" +
-            $"&Hex={day.ToHex()}" +
-            $"&Timestamp={DateTime.UtcNow:O}";
+            $"?cache={DateTime.Now.Ticks}" +
+            $"&computerId={SettingComputer}" +
+            $"&day={day.GetDayCode()}" +
+            $"&hex={day.ToHex()}" +
+            $"&timestamp={DateTime.UtcNow:O}";
 
-        var res = await client.GetAsync(url);
+        using HttpRequestMessage request = new(HttpMethod.Get, url);
+        request.Headers.Host = "swharden.com";
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", SettingSecret);
+        request.Headers.ConnectionClose = true;
+
+        var res = await HttpClient.SendAsync(request);
 
         if (!res.IsSuccessStatusCode)
         {
+            Debug.WriteLine("URL: " + url);
             Debug.WriteLine("Status: " + res.StatusCode);
             Debug.WriteLine("Body: " + await res.Content.ReadAsStringAsync());
             Debug.WriteLine("Headers: " + res.Headers);
