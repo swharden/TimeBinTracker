@@ -86,7 +86,7 @@ public partial class Form1 : Form
 
         HttpStatusCode code = await Uploader.Upload(da);
 
-        if (code == HttpStatusCode.Forbidden)
+        if (code == HttpStatusCode.Forbidden || code == HttpStatusCode.FailedDependency)
         {
             // Retry once if unauthorized.
             // CloudFlare has issues with the first attempt sometimes.

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices.JavaScript;
 
 namespace TimeBinTracker;
 
@@ -47,22 +46,30 @@ public class Uploader
             $"&hex={day.ToHex()}" +
             $"&timestamp={DateTime.UtcNow:O}";
 
-        using HttpRequestMessage request = new(HttpMethod.Get, url);
-        request.Headers.Host = "swharden.com";
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", SettingSecret);
-        request.Headers.ConnectionClose = true;
-
-        var res = await HttpClient.SendAsync(request);
-
-        if (!res.IsSuccessStatusCode)
+        try
         {
-            Debug.WriteLine("URL: " + url);
-            Debug.WriteLine("Status: " + res.StatusCode);
-            Debug.WriteLine("Body: " + await res.Content.ReadAsStringAsync());
-            Debug.WriteLine("Headers: " + res.Headers);
-            Debug.WriteLine("Content Headers: " + res.Content.Headers);
-        }
+            using HttpRequestMessage request = new(HttpMethod.Get, url);
+            request.Headers.Host = "swharden.com";
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", SettingSecret);
+            request.Headers.ConnectionClose = true;
 
-        return res.StatusCode;
+            var res = await HttpClient.SendAsync(request);
+
+            if (!res.IsSuccessStatusCode)
+            {
+                Debug.WriteLine("URL: " + url);
+                Debug.WriteLine("Status: " + res.StatusCode);
+                Debug.WriteLine("Body: " + await res.Content.ReadAsStringAsync());
+                Debug.WriteLine("Headers: " + res.Headers);
+                Debug.WriteLine("Content Headers: " + res.Content.Headers);
+            }
+
+            return res.StatusCode;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("Exception: " + ex);
+            return HttpStatusCode.FailedDependency;
+        }
     }
 }
