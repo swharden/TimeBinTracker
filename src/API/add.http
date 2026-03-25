@@ -1,4 +1,2 @@
-GET https://swharden.com/activity/add/?2&nocache=aaaa&ComputerId=personal-desktop&Day=2026-03-14&Hex=0F441880044A0D020E80C8442B4004100559
-Content-Type: application/x-www-form-urlencoded
-Host: swharden.com
+GET https://swharden.com/activity/add/?ComputerId=personal-desktop&Day=2026-03-25&Hex=0F441880044A0D020E80C8442B4004100559
 Authorization: Bearer secret123

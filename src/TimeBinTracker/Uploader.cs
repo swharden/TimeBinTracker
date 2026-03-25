@@ -41,10 +41,9 @@ public class Uploader
     {
         string url = SettingURL +
             $"?cache={DateTime.Now.Ticks}" +
-            $"&computerId={SettingComputer}" +
-            $"&day={day.GetDayCode()}" +
-            $"&hex={day.ToHex()}" +
-            $"&timestamp={DateTime.UtcNow:O}";
+            $"&ComputerId={SettingComputer}" +
+            $"&Day={day.GetDayCode()}" +
+            $"&Hex={day.ToHex()}";
 
         try
         {
