@@ -1,19 +1,56 @@
-﻿namespace TimeBinTracker.API;
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
+
+namespace TimeBinTracker.API;
 
 public class S3DB
 {
-    public CsvData CsvData { get; }
+    private const string ObjectKey = "time-bin-data.csv";
+    private const string BucketName = "time-bin-tracker";
+    private const string S3Region = "us-east-2";
+    private static readonly AmazonS3Client S3Client = new(RegionEndpoint.GetBySystemName(S3Region));
 
     public S3DB()
     {
-        const string CSV = """
-            #date,     00,  01,  02,  03,  04,  05,  06,  07,  08,  09,  10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  name
-            2026-10-12,0000,0000,0000,0000,0000,0000,0000,0000,0011,1111,1111,1111,1100,0111,1111,1111,1111,1000,0000,0000,0110,1110,0000,0000,test-name
-            2026-10-13,0000,0000,0000,0000,0000,0000,0000,0001,1111,1111,1011,1111,0000,0011,1111,1101,1111,1100,0000,0000,0000,0011,1100,0000,test-name
-            2026-10-14,1100,0000,0000,0000,0000,0000,0000,0000,0111,1111,1111,1110,0000,1111,1111,0011,1111,1111,1000,0000,0000,0000,0111,1111,test-name
-            2026-10-15,1000,0000,0000,0000,0000,0000,0000,0000,0000,0111,1111,1111,1110,0001,1111,1111,1111,0110,0000,0000,0000,0000,0000,0000,test-name
-            """;
+    }
 
-        CsvData = new(CSV);
+    public async Task<CsvData> ReadData(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using GetObjectResponse response = await S3Client.GetObjectAsync(BucketName, ObjectKey, cancellationToken);
+            using var reader = new StreamReader(response.ResponseStream);
+            string csv = await reader.ReadToEndAsync(cancellationToken);
+            return new CsvData(csv);
+        }
+        catch (AmazonS3Exception ex) when (ex.ErrorCode == "NoSuchKey")
+        {
+            await Initialize(cancellationToken);
+            return new CsvData(string.Empty);
+        }
+    }
+
+    private static async Task Initialize(CancellationToken cancellationToken)
+    {
+        await S3Client.PutObjectAsync(new PutObjectRequest
+        {
+            BucketName = BucketName,
+            Key = ObjectKey,
+            ContentBody = string.Empty,
+            ContentType = "text/csv",
+            IfNoneMatch = "*"
+        }, cancellationToken);
+    }
+
+    public Task WriteData(CsvData csvData, CancellationToken cancellationToken = default)
+    {
+        return S3Client.PutObjectAsync(new PutObjectRequest
+        {
+            BucketName = BucketName,
+            Key = ObjectKey,
+            ContentBody = csvData.ToString(),
+            ContentType = "text/csv"
+        }, cancellationToken);
     }
 }

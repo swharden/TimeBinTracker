@@ -6,13 +6,14 @@ namespace TimeBinTracker.API.Endpoints;
 
 public static class Read
 {
-    public async static Task<Ok<UpdateDays>>
+    public static async Task<Ok<UpdateDays>>
     ReadDays(
         [FromQuery] DateOnly startDate,
         [FromQuery] DateOnly endDate,
         [FromServices] S3DB db)
     {
-        UpdateDays response = UpdateDays.FromCsvData(db.CsvData, startDate, endDate);
+        CsvData csvData = await db.ReadData();
+        UpdateDays response = UpdateDays.FromCsvData(csvData, startDate, endDate);
 
         return TypedResults.Ok(response);
     }

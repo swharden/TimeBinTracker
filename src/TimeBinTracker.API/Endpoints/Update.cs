@@ -7,7 +7,7 @@ namespace TimeBinTracker.API.Endpoints;
 
 public static class Update
 {
-    public async static Task<Results<
+    public static async Task<Results<
         UnauthorizedHttpResult,
         Ok<UpdateDays>>>
     UpdateDay(
@@ -37,14 +37,17 @@ public static class Update
                 return TypedResults.Unauthorized();
         }
 
+        CsvData csvData = await db.ReadData();
+
         foreach (var requestDay in body.Days)
         {
             string csvLine = requestDay.ToCsvLine();
             CsvDay day = new(csvLine);
-            db.CsvData.Update(day);
+            csvData.Update(day);
         }
 
-        UpdateDays response = UpdateDays.FromCsvData(db.CsvData);
+        await db.WriteData(csvData);
+        UpdateDays response = UpdateDays.FromCsvData(csvData);
 
         return TypedResults.Ok(response);
     }

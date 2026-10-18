@@ -22,3 +22,7 @@ Resources:
           Properties:
             Path: /
             Method: GET
+  CsvBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: time-bin-tracker
