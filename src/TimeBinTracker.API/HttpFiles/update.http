@@ -1,7 +1,7 @@
 @BASE_URL = https://localhost:5101
+@BASE_URL = https://jtryn4ynkxnvtcndgf65nkvnja0nerxj.lambda-url.us-east-1.on.aws
 
-### Update
-POST {{BASE_URL}}
+POST {{BASE_URL}}/data
 Content-Type: application/json
 Authorization: Bearer <local-testing>
 

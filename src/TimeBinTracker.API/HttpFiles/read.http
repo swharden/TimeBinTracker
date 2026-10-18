@@ -1,6 +1,4 @@
 @BASE_URL = https://localhost:5101
+@BASE_URL = https://jtryn4ynkxnvtcndgf65nkvnja0nerxj.lambda-url.us-east-1.on.aws
 
-### Update
-GET {{BASE_URL}}?startDate=2026-10-12&endDate=2026-10-15
-Content-Type: application/json
-Authorization: Bearer <local-testing>
+GET {{BASE_URL}}/data?startDate=2026-10-12&endDate=2026-10-15
