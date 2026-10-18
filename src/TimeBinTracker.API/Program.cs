@@ -12,5 +12,6 @@ var app = builder.Build();
 app.MapGet("/", () => $"Time Bin Tracker Lambda {TimeBinTracker.Version.Number} {Random.Shared.Next()}");
 app.MapGet("/data", Read.ReadDays);
 app.MapPost("/data", Update.UpdateDay);
+app.MapDelete("/data", Delete.DeleteDay);
 
 app.Run();
