@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeBinTracker.API", "TimeB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeBinTracker.Tests", "TimeBinTracker.Tests\TimeBinTracker.Tests.csproj", "{E5AC2AF4-7A37-F9B2-33C9-DAF708223F81}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeBinTracker.Console", "TimeBinTracker.Console\TimeBinTracker.Console.csproj", "{E0E3E02E-5E07-2258-322A-7C23DE4ECE6C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{E5AC2AF4-7A37-F9B2-33C9-DAF708223F81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5AC2AF4-7A37-F9B2-33C9-DAF708223F81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5AC2AF4-7A37-F9B2-33C9-DAF708223F81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0E3E02E-5E07-2258-322A-7C23DE4ECE6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0E3E02E-5E07-2258-322A-7C23DE4ECE6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0E3E02E-5E07-2258-322A-7C23DE4ECE6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0E3E02E-5E07-2258-322A-7C23DE4ECE6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
