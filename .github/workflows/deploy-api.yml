@@ -31,16 +31,12 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Set up AWS SAM CLI
-        uses: aws-actions/setup-sam@v2
+      - name: Install AWS Lambda .NET tools
+        run: dotnet tool install --global Amazon.Lambda.Tools
 
-      - name: Build and deploy SAM application
+      - name: Package Lambda
         working-directory: src/TimeBinTracker.API
-        run: |
-          sam build
-          sam deploy \
-            --stack-name time-bin-tracker-api \
-            --resolve-s3 \
-            --capabilities CAPABILITY_IAM \
-            --no-confirm-changeset \
-            --no-fail-on-empty-changeset
+        run: dotnet lambda package --configuration Release --function-runtime dotnet10 --output-package bin/Release/function.zip
+
+      - name: Deploy Lambda code
+        run: aws --no-cli-pager lambda update-function-code --function-name time-bin-tracker-lambda --zip-file fileb://src/TimeBinTracker.API/bin/Release/function.zip --region us-east-2
