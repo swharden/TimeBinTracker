@@ -1,4 +1,3 @@
-using Amazon.Lambda.AspNetCoreServer;
 using TimeBinTracker.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
