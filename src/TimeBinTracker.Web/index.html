@@ -318,32 +318,33 @@
 
         /* Legend */
         .legend {
-            margin-top: 28px;
+            margin-bottom: 20px;
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 6px;
-            font-size: 11px;
+            gap: 16px;
+            font-size: 12px;
             color: var(--text-tertiary);
         }
 
-        .legend-bins {
+        .legend-item {
             display: flex;
-            gap: 2px;
             align-items: center;
+            gap: 6px;
         }
 
         .legend-bin {
-            width: 8px;
-            height: 8px;
-            border-radius: 1px;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
         }
 
-        .legend-bin.off {
-            background: var(--green-0);
+        .legend-bin.work {
+            background: var(--active-fill);
         }
 
-        .legend-bin.on {
-            background: var(--green-3);
+        .legend-bin.personal {
+            background: var(--personal-fill);
         }
 
         /* Responsive */
@@ -497,6 +498,11 @@
         <header>
             <h1>Scott's Computer <span>Activity</span></h1>
         </header>
+
+        <div class="legend" aria-label="Activity color key">
+            <div class="legend-item"><span class="legend-bin work"></span>Work computer</div>
+            <div class="legend-item"><span class="legend-bin personal"></span>Personal computer</div>
+        </div>
 
         <div class="calendar-scroll">
             <div class="calendar-inner" id="calendar">
