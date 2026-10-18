@@ -27,6 +27,7 @@
             --hour-line: rgba(31, 35, 40, 0.24);
             --inactive-fill: rgba(235, 237, 240, 0.72);
             --active-fill: rgba(48, 161, 78, 0.88);
+            --personal-fill: rgba(9, 105, 218, 0.88);
             --now-color: #d55e00;
             --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
             --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -239,6 +240,10 @@
 
         .bin[data-active="1"] {
             background: var(--active-fill);
+        }
+
+        .bin[data-active="1"][data-source="personal"] {
+            background: var(--personal-fill);
         }
 
         /* Work-hours boundary markers (weekdays 9–5) */
@@ -528,11 +533,19 @@
             const byDate = new Map();
             (data.days || []).forEach(day => {
                 const bits = activityToBits(day.activity);
+                const isPersonal = (day.name || '').toLowerCase().includes('personal');
                 const existing = byDate.get(day.date);
                 if (existing) {
                     existing.bits = existing.bits.map((b, i) => b | bits[i]);
+                    if (isPersonal) {
+                        existing.personalBits = existing.personalBits.map((b, i) => b | bits[i]);
+                    }
                 } else {
-                    byDate.set(day.date, { date: day.date, bits });
+                    byDate.set(day.date, {
+                        date: day.date,
+                        bits,
+                        personalBits: bits.map(bit => isPersonal ? bit : 0)
+                    });
                 }
             });
 
@@ -545,7 +558,11 @@
                     const key = getLocalDateKey(d);
                     if (key > todayKey) break;
                     if (!byDate.has(key)) {
-                        byDate.set(key, { date: key, bits: new Array(BINS_PER_DAY).fill(0) });
+                        byDate.set(key, {
+                            date: key,
+                            bits: new Array(BINS_PER_DAY).fill(0),
+                            personalBits: new Array(BINS_PER_DAY).fill(0)
+                        });
                     }
                     d.setDate(d.getDate() + 1);
                 }
@@ -654,6 +671,7 @@
                             const bin = document.createElement('div');
                             bin.className = 'bin';
                             bin.dataset.active = active;
+                            if (entry.personalBits[idx]) bin.dataset.source = 'personal';
                             if (isWeekday && h === 9 && q === 0) bin.dataset.workStart = '';
                             if (isWeekday && h === 16 && q === 3) bin.dataset.workEnd = '';
                             hGroup.appendChild(bin);
