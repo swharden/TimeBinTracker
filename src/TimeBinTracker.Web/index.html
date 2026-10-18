@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Calendar</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --bg-secondary: #f6f8fa;
+            --border: #d1d9e0;
+            --border-light: #e8ecf0;
+            --text: #1f2328;
+            --text-secondary: #656d76;
+            --text-tertiary: #8b949e;
+            --green-0: #ebedf0;
+            --green-1: #9be9a8;
+            --green-2: #40c463;
+            --green-3: #30a14e;
+            --green-4: #216e39;
+            --accent: #1a7f37;
+            --hour-w: 5px;
+            --hour-group-w: 20px;
+            --hour-h: 18px;
+            --gap: 0px;
+            --hour-line: rgba(31, 35, 40, 0.24);
+            --inactive-fill: rgba(235, 237, 240, 0.72);
+            --active-fill: rgba(48, 161, 78, 0.88);
+            --now-color: #d55e00;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .page {
+            width: fit-content;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 32px 20px 64px;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .header-eyebrow {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            line-height: 1.25;
+        }
+
+        h1 span {
+            color: var(--accent);
+        }
+
+        /* Loading indicator */
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 48px 0;
+            color: var(--text-tertiary);
+            font-size: 13px;
+        }
+
+        .loading-spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-top-color: var(--text-tertiary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-error {
+            padding: 48px 0;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .loading-error code {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 6px;
+        }
+
+        /* Scroll wrapper for bins on small screens */
+        .calendar-scroll {
+            overflow-x: visible;
+        }
+
+        .calendar-inner {
+            width: fit-content;
+            min-width: fit-content;
+            margin: 0 auto;
+        }
+
+        /* Week group */
+        .week-group {
+            margin-bottom: 32px;
+        }
+
+        .week-header {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+            padding-left: 92px;
+        }
+
+        .week-total {
+            font-weight: 400;
+            color: var(--text-tertiary);
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        /* Day row */
+        .day-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+
+        .day-row-today {
+            margin-bottom: 20px;
+        }
+
+        .day-label {
+            width: 72px;
+            flex-shrink: 0;
+            padding-left: 6px;
+            line-height: 1.2;
+        }
+
+        .day-date-line {
+            display: grid;
+            grid-template-columns: 12px max-content;
+            column-gap: 6px;
+            align-items: baseline;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+        }
+
+        .weekday-letter {
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .date-text {
+            font-family: var(--font-mono);
+        }
+
+        .date-short,
+        .count-compact {
+            display: none;
+        }
+
+        .day-count {
+            margin-left: 8px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-tertiary);
+            min-width: 44px;
+            white-space: nowrap;
+        }
+
+        /* Bins container */
+        .bins {
+            display: flex;
+            gap: 0;
+            align-items: center;
+            position: relative;
+            background-image: linear-gradient(to right, transparent calc(100% - 1px), var(--hour-line) calc(100% - 1px));
+            background-repeat: repeat-x;
+            background-size: var(--hour-group-w) 100%;
+        }
+
+        /* Hour group (4 bins) */
+        .hour-group {
+            display: flex;
+            gap: 0;
+        }
+
+        .hour-group+.hour-group {
+            margin-left: 0;
+        }
+
+        /* Individual bin */
+        .bin {
+            width: var(--hour-w);
+            height: var(--hour-h);
+            border-radius: 0;
+            flex-shrink: 0;
+        }
+
+        .bin[data-active="0"] {
+            background: var(--inactive-fill);
+        }
+
+        .bin[data-active="1"] {
+            background: var(--active-fill);
+        }
+
+        /* Work-hours boundary markers (weekdays 9–5) */
+        .bin[data-work-start] {
+            box-shadow: inset 2px 0 0 0 var(--text);
+        }
+
+        .bin[data-work-end] {
+            box-shadow: inset -2px 0 0 0 var(--text);
+        }
+
+        .now-marker {
+            position: absolute;
+            top: calc(100% + 3px);
+            width: 28px;
+            height: 18px;
+            transform: translateX(-50%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .now-marker::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 0;
+            height: 0;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 7px solid var(--now-color);
+        }
+
+        .now-marker::after {
+            content: 'now';
+            position: absolute;
+            top: 9px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--now-color);
+            font-family: var(--font-sans);
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1;
+            letter-spacing: 0;
+        }
+
+        .view-actions {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .show-all-button {
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--text-tertiary);
+            font-family: var(--font-sans);
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1;
+            padding: 7px 10px;
+            cursor: pointer;
+        }
+
+        .show-all-button:hover {
+            color: var(--accent);
+            background: var(--bg-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            margin-top: 28px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .legend-bins {
+            display: flex;
+            gap: 2px;
+            align-items: center;
+        }
+
+        .legend-bin {
+            width: 8px;
+            height: 8px;
+            border-radius: 1px;
+        }
+
+        .legend-bin.off {
+            background: var(--green-0);
+        }
+
+        .legend-bin.on {
+            background: var(--green-3);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            :root {
+                --hour-w: clamp(2.5px, calc((100vw - 108px) / 96), 4px);
+                --hour-group-w: clamp(10px, calc((100vw - 108px) / 24), 16px);
+                --hour-h: 15px;
+            }
+
+            .page {
+                width: 100%;
+                padding: 20px 6px 48px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .day-label {
+                width: 52px;
+                padding-left: 2px;
+            }
+
+            .day-date-line {
+                grid-template-columns: 10px max-content;
+                column-gap: 4px;
+                font-size: 9px;
+            }
+
+            .week-header {
+                padding-left: 52px;
+                font-size: 10px;
+            }
+
+            .day-count {
+                margin-left: 6px;
+                min-width: 34px;
+                font-size: 9px;
+            }
+
+            .calendar-scroll {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        @media (max-width: 420px) {
+            :root {
+                --hour-w: clamp(2px, calc((100vw - 88px) / 96), 3px);
+                --hour-group-w: clamp(8px, calc((100vw - 88px) / 24), 12px);
+                --hour-h: 14px;
+            }
+
+            .page {
+                padding: 16px 4px 40px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .day-label {
+                width: 42px;
+            }
+
+            .day-date-line {
+                font-size: 9px;
+            }
+
+            .week-header {
+                padding-left: 42px;
+            }
+
+            .date-full,
+            .count-full {
+                display: none;
+            }
+
+            .date-short,
+            .count-compact {
+                display: inline;
+            }
+
+            .day-count {
+                margin-left: 4px;
+                min-width: 30px;
+                font-size: 9px;
+            }
+
+            .hour-group+.hour-group {
+                margin-left: 0;
+            }
+
+            .bin[data-work-start] {
+                box-shadow: inset 1px 0 0 0 var(--text);
+            }
+
+            .bin[data-work-end] {
+                box-shadow: inset -1px 0 0 0 var(--text);
+            }
+
+            .now-marker {
+                top: calc(100% + 3px);
+                width: 24px;
+                height: 16px;
+            }
+
+            .now-marker::before {
+                border-left-width: 4px;
+                border-right-width: 4px;
+                border-bottom-width: 6px;
+            }
+
+            .now-marker::after {
+                top: 8px;
+                font-size: 9px;
+            }
+        }
+
+        @media (max-width: 340px) {
+            :root {
+                --hour-w: clamp(1.75px, calc((100vw - 81px) / 96), 2.6px);
+                --hour-group-w: clamp(7px, calc((100vw - 81px) / 24), 10.4px);
+            }
+
+            .page {
+                padding-left: 3px;
+                padding-right: 3px;
+            }
+
+            .day-label {
+                width: 40px;
+            }
+
+            .week-header {
+                padding-left: 40px;
+            }
+
+            .day-count {
+                margin-left: 3px;
+                min-width: 28px;
+                font-size: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <header>
+            <h1>Scott's Computer <span>Activity</span></h1>
+        </header>
+
+        <div class="calendar-scroll">
+            <div class="calendar-inner" id="calendar">
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    Fetching activity data…
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const DATA_URL = 'https://75shuclh22byaja7qf4m2fusbm0orvqs.lambda-url.us-east-2.on.aws/data';
+        const FALLBACK_DATA_URL = 'sample-data.json';
+        const DAY_LETTERS = ['U', 'M', 'T', 'W', 'H', 'F', 'S'];
+        const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        const BINS_PER_DAY = 96;
+
+        // "0000,1111,..." (24 comma-separated hours of 4 quarter-hour bins) -> [0,0,0,0,1,1,1,1,...]
+        function activityToBits(activity) {
+            const chars = (activity || '').replace(/,/g, '');
+            const bits = new Array(BINS_PER_DAY).fill(0);
+            for (let i = 0; i < BINS_PER_DAY && i < chars.length; i++) {
+                bits[i] = chars[i] === '1' ? 1 : 0;
+            }
+            return bits;
+        }
+
+        // Combine all machines into one entry per date (OR of activity bits),
+        // sorted by date, with missing days filled in for each week that has data.
+        function normalizeData(data) {
+            const byDate = new Map();
+            (data.days || []).forEach(day => {
+                const bits = activityToBits(day.activity);
+                const existing = byDate.get(day.date);
+                if (existing) {
+                    existing.bits = existing.bits.map((b, i) => b | bits[i]);
+                } else {
+                    byDate.set(day.date, { date: day.date, bits });
+                }
+            });
+
+            const todayKey = getLocalDateKey();
+            const weekKeys = new Set([...byDate.keys()].map(getWeekKey));
+            weekKeys.add(getWeekKey(todayKey));
+            weekKeys.forEach(weekKey => {
+                const d = new Date(weekKey + 'T12:00:00');
+                for (let i = 0; i < 7; i++) {
+                    const key = getLocalDateKey(d);
+                    if (key > todayKey) break;
+                    if (!byDate.has(key)) {
+                        byDate.set(key, { date: key, bits: new Array(BINS_PER_DAY).fill(0) });
+                    }
+                    d.setDate(d.getDate() + 1);
+                }
+            });
+
+            return [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date));
+        }
+
+        function formatHours(binCount) {
+            const hours = binCount / 4;
+            const roundedUp = Math.ceil(hours * 10) / 10;
+            return `${roundedUp.toFixed(1)} hr`;
+        }
+
+        function formatHoursCompact(binCount) {
+            return formatHours(binCount).replace(' hr', 'h');
+        }
+
+        function getLocalDateKey(date = new Date()) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getCurrentDayPercent(date = new Date()) {
+            const mins = date.getHours() * 60 + date.getMinutes();
+            return (mins / 1440) * 100;
+        }
+
+        function getWeekKey(dateStr) {
+            const d = new Date(dateStr + 'T12:00:00');
+            const day = d.getDay();
+            const diff = (day === 0) ? -6 : 1 - day;
+            const mon = new Date(d);
+            mon.setDate(d.getDate() + diff);
+            return mon.toISOString().slice(0, 10);
+        }
+
+        function render(data, showAllWeeks = false) {
+            const cal = document.getElementById('calendar');
+            cal.innerHTML = '';
+            const todayKey = getLocalDateKey();
+            const nowPercent = getCurrentDayPercent();
+
+            // Group days by week
+            const weeks = new Map();
+            data.forEach(entry => {
+                const wk = getWeekKey(entry.date);
+                if (!weeks.has(wk)) weeks.set(wk, []);
+                weeks.get(wk).push(entry);
+            });
+
+            const allWeekEntries = [...weeks.entries()];
+            let visibleWeekEntries = showAllWeeks ? allWeekEntries : allWeekEntries.slice(-2);
+            if (showAllWeeks && visibleWeekEntries[0]?.[1].length < 7) {
+                visibleWeekEntries = visibleWeekEntries.slice(1);
+            }
+
+            visibleWeekEntries.forEach(([weekKey, entries]) => {
+                const wkDate = new Date(weekKey + 'T12:00:00');
+
+                // Compute weekly total active bins
+                let weekActive = 0;
+                entries.forEach(e => {
+                    weekActive += e.bits.filter(b => b === 1).length;
+                });
+                const weekTotalStr = formatHours(weekActive);
+
+                const weekDiv = document.createElement('div');
+                weekDiv.className = 'week-group';
+
+                const wkLabel = `Week of ${MONTH_NAMES[wkDate.getMonth()]} ${wkDate.getDate()}`;
+                weekDiv.innerHTML = `<div class="week-header">${wkLabel} <span class="week-total">· ${weekTotalStr}</span></div>`;
+
+                entries.forEach(entry => {
+                    const d = new Date(entry.date + 'T12:00:00');
+                    const dayOfWeek = d.getDay();
+                    const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+                    const bits = entry.bits;
+                    const activeCount = bits.filter(b => b === 1).length;
+
+                    const dayRow = document.createElement('div');
+                    dayRow.className = 'day-row';
+
+                    const dayLabel = document.createElement('div');
+                    dayLabel.className = 'day-label';
+                    dayLabel.innerHTML = `
+                            <div class="day-date-line">
+                                <span class="weekday-letter">${DAY_LETTERS[d.getDay()]}</span>
+                                <span class="date-text date-full">${MONTH_NAMES[d.getMonth()]} ${String(d.getDate()).padStart(2, '0')}</span>
+                                <span class="date-text date-short">${d.getMonth() + 1}/${String(d.getDate()).padStart(2, '0')}</span>
+                            </div>
+                        `;
+                    dayRow.appendChild(dayLabel);
+
+                    const binsDiv = document.createElement('div');
+                    binsDiv.className = 'bins';
+
+                    for (let h = 0; h < 24; h++) {
+                        const hGroup = document.createElement('div');
+                        hGroup.className = 'hour-group';
+                        for (let q = 0; q < 4; q++) {
+                            const idx = h * 4 + q;
+                            const active = bits[idx];
+                            const bin = document.createElement('div');
+                            bin.className = 'bin';
+                            bin.dataset.active = active;
+                            if (isWeekday && h === 9 && q === 0) bin.dataset.workStart = '';
+                            if (isWeekday && h === 16 && q === 3) bin.dataset.workEnd = '';
+                            hGroup.appendChild(bin);
+                        }
+                        binsDiv.appendChild(hGroup);
+                    }
+
+                    if (entry.date === todayKey) {
+                        dayRow.classList.add('day-row-today');
+                        const nowMarker = document.createElement('div');
+                        nowMarker.className = 'now-marker';
+                        nowMarker.style.left = `${nowPercent}%`;
+                        binsDiv.appendChild(nowMarker);
+                    }
+
+                    dayRow.appendChild(binsDiv);
+
+                    const countDiv = document.createElement('div');
+                    countDiv.className = 'day-count';
+                    countDiv.innerHTML = activeCount
+                        ? `<span class="count-full">${formatHours(activeCount)}</span><span class="count-compact">${formatHoursCompact(activeCount)}</span>`
+                        : '';
+                    dayRow.appendChild(countDiv);
+
+                    weekDiv.appendChild(dayRow);
+                });
+
+                cal.appendChild(weekDiv);
+            });
+
+            if (!showAllWeeks && allWeekEntries.length > visibleWeekEntries.length) {
+                const actions = document.createElement('div');
+                actions.className = 'view-actions';
+
+                const showAllButton = document.createElement('button');
+                showAllButton.className = 'show-all-button';
+                showAllButton.type = 'button';
+                showAllButton.textContent = 'display more weeks';
+                showAllButton.addEventListener('click', () => render(data, true));
+
+                actions.appendChild(showAllButton);
+                cal.appendChild(actions);
+            }
+        }
+
+        function fetchActivityData() {
+            return fetch(DATA_URL)
+                .then(res => {
+                    if (!res.ok) return fetch(FALLBACK_DATA_URL);
+                    return res;
+                })
+                .catch(() => fetch(FALLBACK_DATA_URL));
+        }
+
+        // Fetch and render
+        fetchActivityData()
+            .then(res => {
+                if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+                return res.json();
+            })
+            .then(data => render(normalizeData(data)))
+            .catch(err => {
+                document.getElementById('calendar').innerHTML =
+                    `<div class="loading-error">Unable to load activity data. <code>${err.message}</code></div>`;
+            });
+    </script>
+</body>
+
+</html>
