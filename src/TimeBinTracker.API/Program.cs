@@ -8,6 +8,6 @@ builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 var app = builder.Build();
 
 app.MapPost("/", Update.UpdateDay);
-app.MapGet("/", (DateTime? startDate, DateTime? endDate) => Results.Ok(new { startDate, endDate }));
+app.MapGet("/", Read.ReadDays);
 
 app.Run();

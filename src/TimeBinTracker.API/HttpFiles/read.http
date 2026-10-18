@@ -1,0 +1,6 @@
+@BASE_URL = https://localhost:5101
+
+### Update
+GET {{BASE_URL}}?startDate=2026-10-12&endDate=2026-10-15
+Content-Type: application/json
+Authorization: Bearer <local-testing>
