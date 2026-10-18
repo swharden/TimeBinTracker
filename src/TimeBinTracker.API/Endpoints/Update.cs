@@ -33,18 +33,25 @@ public static class Update
         }
         else
         {
-            throw new NotImplementedException(); // TODO: remove after prod token is setup
-            //if (token != config.AuthToken)
-                //return TypedResults.Unauthorized();
+            if (token != config.AuthToken)
+                return TypedResults.Unauthorized();
         }
+
+        const string CSV = """
+            #date,     00,  01,  02,  03,  04,  05,  06,  07,  08,  09,  10,  11,  12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  name
+            2026-10-12,0000,0000,0000,0000,0000,0000,0000,0000,0011,1111,1111,1111,1100,0111,1111,1111,1111,1000,0000,0000,0110,1110,0000,0000,test-name
+            """;
+
+        CsvData csvData = new(CSV);
 
         foreach (var requestDay in body.Days)
         {
             string csvLine = requestDay.ToCsvLine();
-            Console.WriteLine(csvLine);
             CsvDay day = new(csvLine);
-            Console.WriteLine(day);
+            csvData.Update(day);
         }
+
+        Console.WriteLine(csvData);
 
         return TypedResults.Ok();
     }
