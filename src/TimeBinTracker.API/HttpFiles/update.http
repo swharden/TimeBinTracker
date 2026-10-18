@@ -1,5 +1,5 @@
 @BASE_URL = https://localhost:5101
-@BASE_URL = https://jtryn4ynkxnvtcndgf65nkvnja0nerxj.lambda-url.us-east-1.on.aws
+@BASE_URL = https://75shuclh22byaja7qf4m2fusbm0orvqs.lambda-url.us-east-2.on.aws
 
 POST {{BASE_URL}}/data
 Content-Type: application/json
