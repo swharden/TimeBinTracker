@@ -5,8 +5,8 @@ on:
     branches:
       - main
     paths:
-      - 'src/TimeBinTracker.API/**'
-      - '.github/workflows/deploy-api.yml'
+      - "src/TimeBinTracker.API/**"
+      - ".github/workflows/deploy-api.yml"
   workflow_dispatch:
 
 permissions:
@@ -24,7 +24,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: us-east-2
 
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
