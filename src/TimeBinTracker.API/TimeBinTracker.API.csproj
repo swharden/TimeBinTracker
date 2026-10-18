@@ -7,4 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.AspNetCoreServer.Hosting" Version="1.9.1" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TimeBinTracker\TimeBinTracker.csproj" />
+  </ItemGroup>
 </Project>

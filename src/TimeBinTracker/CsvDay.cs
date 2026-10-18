@@ -46,6 +46,6 @@ public class CsvDay
 
     public override string ToString()
     {
-        return $"{Date},{ActivityString},{Name}";
+        return $"{Date:yyyy-MM-dd},{ActivityString},{Name}";
     }
 }
