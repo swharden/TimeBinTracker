@@ -8,7 +8,7 @@ builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 
 var app = builder.Build();
 
-app.MapGet("/", () => $"Time Bin Tracker Lambda 2.1 {Random.Shared.Next()}");
+app.MapGet("/", () => $"Time Bin Tracker Lambda {TimeBinTracker.Version.Number} {Random.Shared.Next()}");
 app.MapGet("/data", Read.ReadDays);
 app.MapPost("/data", Update.UpdateDay);
 

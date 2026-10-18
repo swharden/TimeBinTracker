@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Net;
-using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace TimeBinTracker;
 
@@ -10,6 +11,7 @@ public class Uploader
     private readonly string SettingComputer;
     private readonly string SettingSecret;
     private readonly HttpClient HttpClient = new();
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     public Uploader(string appFolder)
     {
@@ -39,24 +41,31 @@ public class Uploader
 
     public async Task<HttpStatusCode> Upload(DayActivity day)
     {
-        string url = SettingURL +
-            $"?cache={DateTime.Now.Ticks}" +
-            $"&ComputerId={SettingComputer}" +
-            $"&Day={day.GetDayCode()}" +
-            $"&Hex={day.ToHex()}";
-
         try
         {
-            using HttpRequestMessage request = new(HttpMethod.Get, url);
-            request.Headers.Host = "swharden.com";
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", SettingSecret);
-            request.Headers.ConnectionClose = true;
+            string activity = string.Join(",", Enumerable.Range(0, DayActivity.HOURS_PER_DAY)
+                .Select(hour => string.Concat(Enumerable.Range(0, DayActivity.BINS_PER_HOUR)
+                    .Select(bin => day.IsActive(hour * DayActivity.BINS_PER_HOUR + bin) ? '1' : '0'))));
+
+            var payload = new
+            {
+                days = new[]
+                {
+                    new { date = day.GetDayCode(), name = SettingComputer, activity }
+                }
+            };
+
+            using HttpRequestMessage request = new(HttpMethod.Post, SettingURL.TrimEnd('/') + "/data")
+            {
+                Content = JsonContent.Create(payload, options: JsonOptions)
+            };
+            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", SettingSecret);
 
             var res = await HttpClient.SendAsync(request);
 
             if (!res.IsSuccessStatusCode)
             {
-                Debug.WriteLine("URL: " + url);
+                Debug.WriteLine("URL: " + request.RequestUri);
                 Debug.WriteLine("Status: " + res.StatusCode);
                 Debug.WriteLine("Body: " + await res.Content.ReadAsStringAsync());
                 Debug.WriteLine("Headers: " + res.Headers);
