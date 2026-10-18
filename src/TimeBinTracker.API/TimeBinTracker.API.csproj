@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.AspNetCoreServer.Hosting" Version="1.9.1" />
     <PackageReference Include="AWSSDK.S3" Version="4.0.16.4" />
+    <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="4.0.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TimeBinTracker\TimeBinTracker.csproj" />

@@ -1,8 +1,9 @@
 using TimeBinTracker.API;
 using TimeBinTracker.API.Endpoints;
+using Amazon.SimpleSystemsManagement;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<ConfigService>();
+builder.Services.AddSingleton<IAmazonSimpleSystemsManagement, AmazonSimpleSystemsManagementClient>();
 builder.Services.AddSingleton<S3DB>();
 builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 

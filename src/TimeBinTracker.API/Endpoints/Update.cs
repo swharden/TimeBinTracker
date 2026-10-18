@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using TimeBinTracker.API.Models;
+using Amazon.SimpleSystemsManagement;
+using Amazon.SimpleSystemsManagement.Model;
 
 namespace TimeBinTracker.API.Endpoints;
 
@@ -14,7 +16,7 @@ public static class Update
         [FromBody] UpdateDays body,
         HttpContext context,
         [FromServices] S3DB db,
-        [FromServices] ConfigService config)
+        [FromServices] IAmazonSimpleSystemsManagement parameterStore)
     {
         string? authorization = context.Request.Headers.Authorization;
 
@@ -33,7 +35,15 @@ public static class Update
         }
         else
         {
-            if (token != config.AuthToken)
+            var ssmRequest = new GetParameterRequest
+            {
+                Name = "/time-bin-tracker/bearer-token",
+                WithDecryption = true
+            };
+
+            var ssmParameter = await parameterStore.GetParameterAsync(ssmRequest);
+
+            if (token != ssmParameter.Parameter.Value)
                 return TypedResults.Unauthorized();
         }
 
