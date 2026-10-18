@@ -1,9 +1,16 @@
-POST http://localhost:1234
+@BASE_URL = https://localhost:5101
+
+### Update
+POST {{BASE_URL}}
 Content-Type: application/json
 Authorization: Bearer test
 
 {
-  "name": "John Doe",
-  "email": "john.doe@example.com",
-  "roles": ["admin", "user"]
+  "days": [
+    {
+      "date": "2026-10-18",
+      "name": "test-name",
+      "activity": "test-activity"
+    }
+  ]
 }
